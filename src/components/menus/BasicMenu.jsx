@@ -8,6 +8,9 @@ const BasicMenu = () => {
       <ul className="flex p-4 text-white font-bold">
         <li className="pr-6 text-2xl">
           <Link to={'/'}>Main</Link>
+          <div>
+          <Link to={'/chat/1'}>ChatMessage</Link>
+          </div>
         </li>
       </ul>
     </div>

@@ -1,10 +1,12 @@
+import GroupView from "../components/Main/GroupView";
 import BasicLayout from "../layouts/BasicLayout";
 
 const MainPage = () => {
   return (
     <BasicLayout>
       
-      <div className=" text-3xl">Main Page</div>
+
+      <GroupView/>
     </BasicLayout> 
     
    );
