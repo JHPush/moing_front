@@ -1,4 +1,5 @@
 import { Suspense, lazy } from "react";
+import moimRouter from "./moingRouter";
 
 const { createBrowserRouter } = require("react-router-dom");
 
@@ -30,8 +31,9 @@ const root = createBrowserRouter([
     element: <Suspense fallback={Loading}><CreateMoimPage/></Suspense>
   },
   {
-    path: "/introduct-moim",
-    element: <Suspense fallback={Loading}><IntroductionMoimPage/></Suspense>
+    path: "introduct-moim/:moimid",
+    element: <Suspense fallback={Loading}><IntroductionMoimPage/></Suspense>,
+    children: moimRouter()
   }
 
 

@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getPresignedURL_get } from "../../../api/moimAPI";
 
 const ProfileCard = () => {
+
   return (
     <div className="bg-white rounded-2xl shadow p-4 flex flex-col h-[320px]">
       <div className="w-full h-36 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
