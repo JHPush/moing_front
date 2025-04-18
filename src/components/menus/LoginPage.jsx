@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 import { saveUserToCookies } from '../../utils/cookieUtils'; // 쿠키 유틸스 추가
 import axios from 'axios'; // API 호출을 위한 axios
+import BasicLayout from '../../layouts/BasicLayout';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -82,6 +83,7 @@ const LoginPage = () => {
   };
 
   return (
+    <BasicLayout>
     <div className="p-8">
       <h2 className="text-xl font-bold mb-4">로그인</h2>
       <div className="space-y-4">
@@ -106,6 +108,7 @@ const LoginPage = () => {
         </button>
       </div>
     </div>
+    </BasicLayout>
   );
 };
 

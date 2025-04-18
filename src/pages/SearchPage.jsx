@@ -1,4 +1,5 @@
-import GroupView from "../components/Main/GroupView";
+
+import SearchGroup from "../components/Main/SearchGroup";
 import BasicLayout from "../layouts/BasicLayout";
 
 const MainPage = () => {
@@ -6,7 +7,7 @@ const MainPage = () => {
     <BasicLayout>
       
 
-      <GroupView/>
+      <SearchGroup/>
     </BasicLayout> 
     
    );

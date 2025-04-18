@@ -1,0 +1,90 @@
+/* 폰트 설정 */
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+
+/* 카테고리 필터 */
+.category-filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.category-button {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.category-button:hover {
+    background-color: #ddd;
+}
+
+/* 모임 리스트 */
+.gathering-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* 모임 박스 */
+.gathering-box {
+    width: 23%;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gathering-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.gathering-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* 텍스트 스타일 */
+h2, h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* 내 모임 목록 */
+.my-groups-container {
+    padding: 20px;
+}
+
+.text-center {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* 그룹 목록 */
+.group-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* 모임 이름 */
+.gathering-name {
+    margin-top: 10px;
+    font-size: 1.2rem;
+}
