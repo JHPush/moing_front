@@ -24,7 +24,7 @@ const SearchGroup = () => {
       const fetchData = async() =>{
 
       try{
-          const res = await axios.get(`https://sey4ui2fw2.execute-api.ap-northeast-2.amazonaws.com/dev/gatherings/search?keyword=${encodeURIComponent(mappedKeywords)}`);
+          const res = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups/search?keyword=${encodeURIComponent(mappedKeywords)}`);
           console.log('res.data.body:', res.data.body)
           setGatherings(JSON.parse(res.data.body));
         }
@@ -45,6 +45,7 @@ const SearchGroup = () => {
     
 return(
   <>
+  
   <div className="search-container">
     <form onSubmit={handleSearch} className="search-form">
       <input

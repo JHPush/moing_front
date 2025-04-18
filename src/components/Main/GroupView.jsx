@@ -13,10 +13,10 @@ const GroupView = () => {
     const navigate = useNavigate();
 
     const getGroup = async () =>{
-
+        // ?category=${category}
         const url = category
-            ? `https://sey4ui2fw2.execute-api.ap-northeast-2.amazonaws.com/dev/gatherings?category=${category}`
-            : `https://sey4ui2fw2.execute-api.ap-northeast-2.amazonaws.com/dev/gatherings`
+            ? `https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups`
+            : `https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups`
         console.log('category: ', category)
 
         const res = await axios.get(url);
@@ -58,12 +58,12 @@ const GroupView = () => {
         <div className="board-view">
             <h1 className="text-center">모든 모임 목록</h1>
             <div className="category-filters">
-                <button onClick={() => setCategory('sport')} className="category-button">스포츠</button>
-                <button onClick={() => setCategory('culture')} className="category-button">문화</button>
-                <button onClick={() => setCategory('community')} className="category-button">친목</button>
-                <button onClick={() => setCategory('food')} className="category-button">음식</button>
-                <button onClick={() => setCategory('study')} className="category-button">학습</button>
-                <button onClick={() => setCategory('hobby')} className="category-button">취미</button>
+                <button onClick={() => setCategory('레저')} className="category-button">레저</button>
+                <button onClick={() => setCategory('스포츠')} className="category-button">스포츠</button>
+                <button onClick={() => setCategory('문화예술')} className="category-button">문화예술</button>
+                <button onClick={() => setCategory('스터디')} className="category-button">스터디</button>
+                <button onClick={() => setCategory('음식')} className="category-button">음식</button>
+                <button onClick={() => setCategory('취미')} className="category-button">취미</button>
                 <button onClick={() => setCategory('')} className="category-button">전체보기</button>
             </div>
             <div className="gathering-list">
