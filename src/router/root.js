@@ -6,6 +6,8 @@ const Loading = <div>Loading....</div>
 const Main = lazy(() => import("../pages/MainPage"))
 const ChatMessage = lazy(() => import ("../components/Message/ChatMessage"))
 const SearchGroup = lazy(() => import ("../components/Main/SearchGroup"))
+const CreateMoimPage = lazy(()=>import("../pages/CreateMoimPage"))
+const IntroductionMoimPage = lazy(()=>import("../pages/IntroductionMoimPage"))
 
 
 const root = createBrowserRouter([
@@ -22,6 +24,15 @@ const root = createBrowserRouter([
     path: "/search",
     element: <Suspense fallback={Loading}><SearchGroup/></Suspense>
   },
+  {
+
+    path: "/create-moim",
+    element: <Suspense fallback={Loading}><CreateMoimPage/></Suspense>
+  },
+  {
+    path: "/introduct-moim",
+    element: <Suspense fallback={Loading}><IntroductionMoimPage/></Suspense>
+  }
 
 
 
