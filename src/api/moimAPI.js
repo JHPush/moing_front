@@ -1,16 +1,18 @@
 import axios from "axios"
 
-const MOING_API_URL = 'https://4nfxslyaig.execute-api.ap-northeast-2.amazonaws.com/dev/moing'
+const PREFIX_URL = 'https://4nfxslyaig.execute-api.ap-northeast-2.amazonaws.com/dev'
+const MOING_API_URL = '/moing'
+const MOING_PRESIGN_URL = '/sign'
 
 export const getPresignedURL = async (name, type)=>{
-    console.log(`${MOING_API_URL}`, {
+    console.log(`${PREFIX_URL+MOING_PRESIGN_URL}`, {
         params: {
           filename: name,
           filetype: type
         }
       });
 
-    return (await axios.get(`${MOING_API_URL}`, {params:{
+    return (await axios.get(`${PREFIX_URL+MOING_PRESIGN_URL}`, {params:{
         'filename': name,
         'filetype': type
     }})).data.body;
@@ -26,5 +28,5 @@ export const putUploadMoimProfile = async (url, file)=>{
 
 export const postCreateMoing = async(form)=>{
     const headers = {'Content-Type': 'application/json'};
-    return (await axios.post(`${MOING_API_URL}`, form, {headers})).data;
+    return (await axios.post(`${PREFIX_URL+MOING_API_URL}`, form, {headers})).data;
 }

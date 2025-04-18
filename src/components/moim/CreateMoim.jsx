@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getPresignedURL, postCreateMoing, putUploadMoimProfile } from '../../api/moimAPI';
+import SelectLocation from './SelectLocation';
+import { hangjungdong } from "../../assets/data/hangjungdong"
 
+const { sido, sigugun, dong } = hangjungdong;
 
 const initMoimForm = {
     owner_id: 'test',
@@ -19,12 +22,16 @@ const CreateMoim = () => {
 
     const [snapshots, setSnapshots] = useState([]);
     const [profile, setProfile] = useState(null)
+    const [showLocationModal, setShowLocationModal] = useState(false);
 
-    // const extractFileInfo = (path) => {
-    //     const fileName = path.split('/').pop();
-    //     const fileType = fileName.includes('.') ? fileName.split('.').pop() : null;
-    //     return { name: fileName, type: fileType };
-    // };
+    const handleSelectLocation = (e) => {
+        // setMoim({ ...moim, ['region']: sido === e[0] + sigugun.find(e[1]).codeNm + dong.find(e[2]).codeNm })
+        const _dong = dong.find(item => item.sido === e[0] && item.sigugun === e[1] && item.dong === e[2]).codeNm
+        setMoim({ ...moim, ['region']: _dong })
+        console.log(moim.region)
+
+        setShowLocationModal(false);
+    }
 
     const convertUrlToFile = async (url) => {
         try {
@@ -50,7 +57,7 @@ const CreateMoim = () => {
     }
 
     const handleCreateMoing = (e) => {
-        if (moim.name == '' || moim.introduction_content.length < 30 || moim.category == '' || moim.region == '' || profile == null) {
+        if (moim.name == '' || moim.introduction_content.length < 10 || moim.category == '' || moim.region == '' || profile == null) {
             console.log(moim)
             alert('빈 항목을 작성해주세요')
             return
@@ -58,22 +65,28 @@ const CreateMoim = () => {
         convertUrlToFile(profile).then(file => {
             getPresignedURL(file.name, file.type).then(data => {
                 const temp = JSON.parse(data)
-                console.log('file url : ', temp['file_url'])
+                const fileUrl = temp['file_url']
+                console.log('file url : ', fileUrl)
 
-                setMoim({ ...moim, ['snapshot']: `${temp['file_url']}` })
-
-                console.log('moim : ', moim)
-
-                putUploadMoimProfile(temp['upload_url'], file).then(() => {
-
-                    postCreateMoing(moim).then(data => {
-                        console.log(data)
-                    }).catch(e => {
-                        console.error('Failed Create Moim !! ', e)
-                    })
-                }).catch(e => {
-                    console.error('Failed Insert S3 From Presigned URL !! ', e)
+                // setMoim({ ...moim, snapshot: fileUrl })
+                setMoim((prevMoim) => {
+                    const updateMoim = { ...prevMoim, snapshot: fileUrl }
+                    if (!prevMoim.snapshot) {
+                        console.log("Request S3 Start !! ")
+                        putUploadMoimProfile(temp['upload_url'], file).then(() => {
+                            postCreateMoing(updateMoim).then(data => {
+                                console.log(data)
+                            }).catch(e => {
+                                console.error('Failed Create Moim !! ', e)
+                            })
+                        }).catch(e => {
+                            console.error('Failed Insert S3 From Presigned URL !! ', e)
+                        })
+                    }
+                    return updateMoim
                 })
+
+
             }).catch(e => {
                 console.error('Failed Get Presigned URL !! ', e)
             })
@@ -132,7 +145,7 @@ const CreateMoim = () => {
                             {snapshots.slice(0, 7).map((src, i) => (
                                 <div
                                     key={i}
-                                    className={`border rounded-lg h-20 overflow-hidden cursor-pointer ${moim.snapshot === src ? 'ring-2 ring-blue-500' : ''
+                                    className={`border rounded-lg h-20 overflow-hidden cursor-pointer ${profile === src ? 'ring-2 ring-blue-500' : ''
                                         }`}
                                     onClick={() => setProfile(src)}
                                 >
@@ -146,7 +159,7 @@ const CreateMoim = () => {
                 <textarea
                     name='introduction_content'
                     className="w-full p-4 border border-gray-300 rounded-xl mb-6 resize-none min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    placeholder="함께 하고 싶은 모임 활동을 자세히 소개해주세요 (30자 이상)"
+                    placeholder="함께 하고 싶은 모임 활동을 자세히 소개해주세요 (10자 이상)"
                     onChange={handleUpdateMoim}
                 />
 
@@ -174,24 +187,27 @@ const CreateMoim = () => {
 
                 <hr className="my-6" />
 
-                {/* 지역 선택 */}
+                {/* 지역 선택 UI */}
                 <div className="mb-10">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">📍 모임 지역을 선택하세요</h2>
-
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">지역을 선택하세요</h2>
                     <button
                         className="px-5 py-3 rounded-full text-sm bg-green-100 text-green-800 font-medium hover:bg-green-200 transition-all duration-200 shadow-sm"
-                        onClick={() => {
-                            // 팝업 띄우는 로직은 별도 구현
-                            // 예: openRegionSelector()
-                        }}
+                        onClick={() => setShowLocationModal(true)}
                     >
                         지역 선택
                     </button>
-
                     {moim.region && (
-                        <p className="mt-4 text-sm text-green-600 font-medium">선택된 지역: {moim.region}</p>
+                        <p className="mt-4 text-sm text-green-600 font-medium">{moim.region}</p>
                     )}
                 </div>
+
+                {/* 모달 컴포넌트 */}
+                {showLocationModal && (
+                    <SelectLocation
+                        onClose={() => setShowLocationModal(false)}
+                        onSave={handleSelectLocation}
+                    />
+                )}
 
                 {/* 참여 제한 */}
                 {/* <div className="mb-6">
