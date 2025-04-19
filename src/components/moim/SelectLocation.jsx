@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {hangjungdong} from "../../assets/data/hangjungdong"
+import { hangjungdong } from "../../assets/data/hangjungdong"
 
 const SelectLocation = ({ onClose, onSave }) => {
     const [val1, setVal1] = useState("");
@@ -8,9 +8,9 @@ const SelectLocation = ({ onClose, onSave }) => {
     const { sido, sigugun, dong } = hangjungdong;
     // console.log(hangjungdong)
     const handleSave = () => {
-        const selectedRegion = [val1,val2, val3];  // 문자열로 조합
+        const selectedRegion = [val1, val2, val3];  // 문자열로 조합
         onSave(selectedRegion);  // 부모에 전달!
-      };
+    };
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
             <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl">

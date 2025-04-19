@@ -28,7 +28,7 @@ const root = createBrowserRouter([
     element: <Navigate to="/" />,
   },
   {
-    path: "",
+    path: "/",
     element: <Suspense fallback={Loading}><Main/></Suspense>
   },
   {

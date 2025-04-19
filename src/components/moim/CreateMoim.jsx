@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { getPresignedURL_put, postCreateMoing, putUploadMoimProfile } from '../../api/moimAPI';
 import SelectLocation from './SelectLocation';
 import { hangjungdong } from "../../assets/data/hangjungdong"
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const { sido, sigugun, dong } = hangjungdong;
 
 const initMoimForm = {
-    owner_id: 'test',
+    owner_id: '',
     name: '',
     introduction_content: '',
     category: '',
@@ -17,7 +19,8 @@ const initMoimForm = {
 }
 
 const CreateMoim = () => {
-
+    const nav = useNavigate();
+    const user = useSelector(state => state.user.user)
     const [moim, setMoim] = useState({ ...initMoimForm });
 
     const [snapshots, setSnapshots] = useState([]);
@@ -57,9 +60,16 @@ const CreateMoim = () => {
     }
 
     const handleCreateMoing = (e) => {
+        let checkDouble = false
+
         if (moim.name == '' || moim.introduction_content.length < 10 || moim.category == '' || moim.region == '' || profile == null) {
             console.log(moim)
             alert('빈 항목을 작성해주세요')
+            return
+        }
+        if (user == null) {
+            alert('로그인 정보 없음, 다시 로그인하세요')
+            nav('/', { replace: true })
             return
         }
         convertUrlToFile(profile).then(file => {
@@ -67,15 +77,17 @@ const CreateMoim = () => {
                 const temp = JSON.parse(data)
                 const fileUrl = temp['file_url']
                 console.log('file url : ', fileUrl)
-
-                // setMoim({ ...moim, snapshot: fileUrl })
                 setMoim((prevMoim) => {
-                    const updateMoim = { ...prevMoim, snapshot: fileUrl }
-                    if (!prevMoim.snapshot) {
+                    const updateMoim = { ...prevMoim, snapshot: fileUrl, owner_id: user.userId }
+                    console.log(updateMoim)
+                    if (!checkDouble) {
+                        checkDouble = true
                         console.log("Request S3 Start !! ")
                         putUploadMoimProfile(temp['upload_url'], file).then(() => {
                             postCreateMoing(updateMoim).then(data => {
                                 console.log(data)
+                                alert('모임 생성 완료!')
+                                nav('/', { replace: true })
                             }).catch(e => {
                                 console.error('Failed Create Moim !! ', e)
                             })
