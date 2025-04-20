@@ -9,9 +9,9 @@ const Main = lazy(() => import("../pages/MainPage"))
 const ChatMessage = lazy(() => import ("../components/Message/ChatMessage"))
 const SearchGroup = lazy(() => import ("../components/Main/SearchGroup"))
 const CreateMoimPage = lazy(()=>import("../pages/CreateMoimPage"))
-const IntroductionMoimPage = lazy(()=>import("../pages/IntroductionMoimPage"))
 const LoginPage = lazy(() => import("../components/menus/LoginPage"));
 const SignupPage = lazy(() => import("../components/menus/SignupPage"));
+const MoimPage = lazy(()=>import("../pages/MoimPage"))
 
 const root = createBrowserRouter([
 
@@ -45,8 +45,8 @@ const root = createBrowserRouter([
     element: <Suspense fallback={Loading}><CreateMoimPage/></Suspense>
   },
   {
-    path: "introduct-moim/:moimid",
-    element: <Suspense fallback={Loading}><IntroductionMoimPage/></Suspense>,
+    path: "/moim/:moimid",
+    element: <Suspense fallback={Loading}><MoimPage/></Suspense>,
     children: moimRouter()
   }
 

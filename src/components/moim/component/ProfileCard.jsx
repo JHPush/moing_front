@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getMoimProfileImage, getPresignedURL_get } from "../../../api/moimAPI";
 
-const ProfileCard = ({ moim }) => {
+const ProfileCard = ({ moim, user }) => {
   const [moimProfile, setMoimProfile] = useState(null)
-
   useEffect(() => {
     if (!moimProfile) {
       getPresignedURL_get(moim.file_url).then(data => {
@@ -20,26 +19,31 @@ const ProfileCard = ({ moim }) => {
   }, [moim])
 
   return (
-    <div className="bg-white rounded-2xl shadow p-4 flex flex-col h-[320px]">
-      <div className="relative w-full h-48 bg-gray-300 overflow-hidden flex items-center justify-center">
-        {moimProfile ? (
-          <img
-            src={moimProfile}
-            alt="Fetched Image"
-            className="absolute inset-0 h-full w-full object-cover object-bottom"
-          />
-        ) : (
-          <p>Loading image...</p>
-        )}
+    <aside className="col-span-1 space-y-4">
+      <div className="bg-white p-4 rounded-xl shadow-sm text-center">
+        <div className="w-24 h-24 mx-auto bg-gray-300 rounded-lg mb-4">
+          {moimProfile ? (
+            <img
+              src={moimProfile}
+              alt="Fetched Image"
+              className="inset-0 h-full w-full object-cover object-bottom"
+            />
+          ) : (
+            <p>Loading image...</p>
+          )}
+
+        </div>
+        <h2 className="font-bold text-lg">{moim.name} 모임</h2>
+        <p className="text-sm font-bold  text-gray-500">모임장 {user.nickname}</p>
+        <p className="text-xs text-gray-400 mt-1">사진을 좋아하는 사람들끼리 모이는 곳</p>
+        <p className="text-sm text-gray-500 mt-2">멤버 {moim.member_count}</p>
+        <p className="text-sm text-blue-600">{moim.id}</p>
+        <div className="mt-2 text-left">
+          <span className="text-xs bg-gray-200 text-gray-600 rounded px-2 py-1">{moim.category}</span>
+        </div>
       </div>
-      <h2 className="text-lg font-semibold">{moim.name} 모임</h2>
-      <p className="text-sm text-gray-500">멤버 {moim.member_count}</p>
-      <p className="text-sm text-gray-500 mb-2">모임장 {moim.owner_id}</p>
-      <p className="text-sm text-blue-600">{moim.id}</p>
-      <div className="mt-2">
-        <span className="text-xs bg-gray-200 text-gray-600 rounded px-2 py-1">{moim.category}</span>
-      </div>
-    </div>
+    </aside>
+
   );
 };
 

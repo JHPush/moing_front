@@ -60,7 +60,7 @@ const BasicMenu = () => {
           <button name="/create-moim" onClick={checkLogin}>모임 생성</button> 
           </li>
           <li className="pr-6 text-2xl">
-          <button name="/introduct-moim/moimid?moimid=moing.us-파일생성%20테스트&category=영화" onClick={checkLogin}>임시 모임 조회</button> 
+          <button name="/moim/moimid?moimid=moing.us-파일생성%20테스트&category=영화" onClick={checkLogin}>임시 모임 조회</button> 
           </li>
         </ul>
       </div>

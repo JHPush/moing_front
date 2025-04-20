@@ -1,42 +1,14 @@
-import { CameraIcon, UsersIcon, CalendarDaysIcon, MapPinIcon } from "lucide-react";
 import ProfileCard from "./component/ProfileCard";
 import IntroductionCard from "./component/IntroductionCard";
 import NoticeCard from "./component/NoticeCard";
 import ActivityCard from "./component/ActivityCard";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getMoim, putJoinMoim } from "../../api/moimAPI";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {  putJoinMoim } from "../../api/moimAPI";
 
-const initMoimForm = {
-    owner_id: '',
-    name: '',
-    file_url:'',
-    introduction_content: '',
-    category: '',
-    region: '',
-    snapshot: ''
-}
 
-const IntroductionMoim = () => {
-    const user = useSelector(state => state.user.user)
-    const location = useLocation();
+
+const IntroductionMoim = ({moim, user}) => {
     const nav = useNavigate();
-    const searchParams = new URLSearchParams(location.search);
-    const id = searchParams.get('moimid');
-    const category = searchParams.get('category');
-
-    const [moim, setMoim] = useState({...initMoimForm})
-
-    useEffect(()=>{
-        if(moim.name===''){
-            getMoim(id, category).then(data=>{
-                setMoim(JSON.parse(data.body))
-            }).catch(e=>{
-                console.log('get moim error : ', e)
-            })
-        }
-    },[])
 
     const handleOnClickJoinMoim = (e)=>{
         if (user == null) {
@@ -60,7 +32,7 @@ const IntroductionMoim = () => {
             <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
                 {/* 프로필 카드와 그 아래 가입 버튼 */}
                 <div className="col-span-3 flex flex-col gap-4">
-                    <ProfileCard moim={moim}/>
+                    <ProfileCard moim={moim} user={user}/>
                     <button className="w-full bg-blue-500 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-600 shadow" onClick={handleOnClickJoinMoim} >
                         모임 가입하기
                     </button>
