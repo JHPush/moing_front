@@ -19,6 +19,11 @@ const SearchGroup = () => {
 
       setKeyword(keywordParam);
 
+      if (!keywordParam.trim()) {
+        setGatherings([]);
+        return;
+      }
+
       const mappedKeywords = keywordMap[keywordParam] || [keywordParam];
 
       const fetchData = async() =>{
@@ -35,8 +40,7 @@ const SearchGroup = () => {
       }
     }
       fetchData();
-      }, [searchParams]);
-
+      }, [keywordParam]);
 
       const handleSearch = (e) =>{
         e.preventDefault();
