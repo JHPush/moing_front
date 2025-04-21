@@ -10,7 +10,6 @@ const MyGroupView = ()=>{
     const getMyGroup = async () =>{
         const res = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups/mine`);
 
-        console.log('res.data.body:', res.data.body)
 
         setGatherings(JSON.parse(res.data.body));
 

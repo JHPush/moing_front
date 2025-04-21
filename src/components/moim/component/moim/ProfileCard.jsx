@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getMoimProfileImage, getPresignedURL_get } from "../../../api/moimAPI";
+import { getMoimProfileImage, getPresignedURL_get } from "../../../../api/moimAPI";
 
 const ProfileCard = ({ moim, user }) => {
   const [moimProfile, setMoimProfile] = useState(null)

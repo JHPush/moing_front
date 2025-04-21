@@ -85,6 +85,11 @@ const CreateMoim = () => {
                         console.log("Request S3 Start !! ")
                         putUploadMoimProfile(temp['upload_url'], file).then(() => {
                             postCreateMoing(updateMoim).then(data => {
+                                if(data.statusCode !== 200){
+                                    alert('모임 생성 실패')
+                                    console.log(data)
+                                    return
+                                }
                                 console.log(data)
                                 alert('모임 생성 완료!')
                                 nav('/', { replace: true })

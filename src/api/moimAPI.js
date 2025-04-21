@@ -3,6 +3,7 @@ import axios from "axios"
 const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev'
 const MOING_API_URL = '/moing/detail'
 const MOING_JOIN_URI = '/join'
+const MOING_POST_URI = '/post'
 const MOING_PRESIGN_URL_PUT = '/sequre/puts'
 const MOING_PRESIGN_URL_GET = '/sequre/gets'
 
@@ -20,6 +21,10 @@ export const getPresignedURL_put = async (name, type) => {
             'filetype': type
         }
     })).data.body;
+}
+
+export const getAllPostByMoimId = async(moim_id)=>{
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, {params: {'moim_id' : moim_id}})).data.body
 }
 
 export const getPresignedURL_get = async (fileurl) => {
@@ -51,4 +56,24 @@ export const putUploadMoimProfile = async (url, file) => {
 export const postCreateMoing = async (form) => {
     const headers = { 'Content-Type': 'application/json' };
     return (await axios.post(`${PREFIX_URL + MOING_API_URL}`, form, { headers })).data;
+}
+
+
+export const postMoimPost = async(form)=>{
+    const headers = {'Content-Type': 'application/json'}
+    return (await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form ,{headers})).data
+}
+
+export const deleteMoimPost = async(form)=>{
+    console.log('api del : ', form)
+    const headers = {'Content-Type': 'application/json'}
+    return (await axios.delete(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, {data:form, headers})).data
+}
+
+
+export const updateMoimPost = async(form)=>{
+    console.log('api upd : ', form)
+
+    const headers = {'Content-Type': 'application/json'}
+    return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form, {headers})).data
 }
