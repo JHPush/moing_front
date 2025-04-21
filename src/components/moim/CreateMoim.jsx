@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPresignedURL, postCreateMoing, putUploadMoimProfile } from '../../api/moimAPI';
+import { getPresignedURL_put, postCreateMoing, putUploadMoimProfile } from '../../api/moimAPI';
 import SelectLocation from './SelectLocation';
 import { hangjungdong } from "../../assets/data/hangjungdong"
 
@@ -63,7 +63,7 @@ const CreateMoim = () => {
             return
         }
         convertUrlToFile(profile).then(file => {
-            getPresignedURL(file.name, file.type).then(data => {
+            getPresignedURL_put(file.name, file.type).then(data => {
                 const temp = JSON.parse(data)
                 const fileUrl = temp['file_url']
                 console.log('file url : ', fileUrl)
@@ -110,7 +110,7 @@ const CreateMoim = () => {
             <div className="w-full max-w-5xl bg-white p-8 rounded-2xl shadow-lg">
                 {/* 모임 이름 */}
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-gray-500 mb-4">모임 생성</h2>
+                    <h2 className="text-left text-xl font-semibold text-gray-500 mb-4">모임 생성</h2>
                     {(
                         <input
                             name='name'
@@ -165,10 +165,10 @@ const CreateMoim = () => {
 
                 {/* 주제 선택 */}
                 <div className="mb-10">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">주제를 선택하세요</h2>
+                    <h2 className="text-left text-xl font-semibold text-gray-800 mb-4">주제를 선택하세요</h2>
 
                     <div className="flex flex-wrap gap-3">
-                        {['등산', '낚시', '스터디', '게임', '맛집탐방', '영화', '운동', '사진', '반려동물', '요리', '코딩', '드라이브', '여행', '음악', '책'].map((item) => (
+                        {['레저', '스포츠', '문화예술', '스터디', '음식', '취미'].map((item) => (
                             <button
                                 key={item}
                                 className={`px-4 py-2 rounded-full text-sm transition-all duration-200 shadow-sm
@@ -189,7 +189,7 @@ const CreateMoim = () => {
 
                 {/* 지역 선택 UI */}
                 <div className="mb-10">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">지역을 선택하세요</h2>
+                    <h2 className="text-left text-xl font-semibold text-gray-800 mb-4">지역을 선택하세요</h2>
                     <button
                         className="px-5 py-3 rounded-full text-sm bg-green-100 text-green-800 font-medium hover:bg-green-200 transition-all duration-200 shadow-sm"
                         onClick={() => setShowLocationModal(true)}

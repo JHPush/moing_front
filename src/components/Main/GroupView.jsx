@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import MyGroupView from "./MyGroupView";
-import SearchGroup from "./SearchGroup";
 import { useNavigate } from "react-router-dom";
+import { getAllGroup } from "../../api/mainAPI";
+import { getPresignedURL_get } from "../../api/moimAPI";
 import '../../css/GroupBox.css' 
 import '../../css/SearchBox.css' 
+import UserLocation from "./UserLocation";
 
 const GroupView = () => {
     const [gatherings, setGatherings] = useState([]);
@@ -13,17 +15,13 @@ const GroupView = () => {
     const navigate = useNavigate();
 
     const getGroup = async () =>{
-        // ?category=${category}
-        const url = category
-            ? `https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups`
-            : `https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups`
-        console.log('category: ', category)
 
-        const res = await axios.get(url);
-
-        console.log('res.data.body:', res.data.body)
-
-        setGatherings(JSON.parse(res.data.body));
+        const data = await getAllGroup(category);
+        const groupList = JSON.parse(data);
+        console.log("category: ", category)
+        setGatherings(groupList);
+        console.log("groupList:", groupList)
+      
 
     }
 
@@ -38,6 +36,7 @@ const GroupView = () => {
 
     return (
         <>
+        <UserLocation/>
         <form onSubmit={handleSearch} className="search-form">
             <input
                 type="text"
@@ -58,13 +57,24 @@ const GroupView = () => {
         <div className="board-view">
             <h1 className="text-center">모든 모임 목록</h1>
             <div className="category-filters">
-                <button onClick={() => setCategory('레저')} className="category-button">레저</button>
-                <button onClick={() => setCategory('스포츠')} className="category-button">스포츠</button>
-                <button onClick={() => setCategory('문화예술')} className="category-button">문화예술</button>
-                <button onClick={() => setCategory('스터디')} className="category-button">스터디</button>
-                <button onClick={() => setCategory('음식')} className="category-button">음식</button>
-                <button onClick={() => setCategory('취미')} className="category-button">취미</button>
-                <button onClick={() => setCategory('')} className="category-button">전체보기</button>
+            {['레저', '스포츠', '문화예술', '스터디', '음식', '취미', ''].map((cate) => (
+                <button
+                key={cate || '전체보기'}
+                onClick={() => setCategory(cate)}
+                className="category-button"
+                style={{
+                  backgroundColor: category === cate ? '#add8e6' : '#f0f0f0', // 선택된 버튼은 연한 파랑, 나머지는 회색
+                  color: 'black', // 글자 색은 항상 검정
+                  border: '1px solid #ccc',
+                  padding: '8px 12px',
+                  marginRight: '8px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                }}
+                >
+                {cate || '전체보기'}
+                </button>
+            ))}
             </div>
             <div className="gathering-list">
                 {gatherings.map((gathering) => (

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { loadInitialMessages,loadOlderMessages, connectWebSocket } from "../../api/chatAPI";
 
 const ChatMessage = () =>{
 
@@ -12,16 +14,21 @@ const ChatMessage = () =>{
     const [messageInput, setMessageInput] = useState('');
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
+    // const messagesContainerRef = useRef(null);
+
+    const user = useSelector(state => state.user.user)
+   
+    const nickname = user.nickname
+    const profile =user.profileImageUrl
+
 
     useEffect(()=>{
         // 기존 메시지 로드
         const fetchMessages = async () => {
             try {
-                const response = await fetch(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/chats/${gatheringId}`);
-                const data = await response.json();
-                console.log('data: ', data)
-                setMessages(data.body || []);  
-                console.log('data.body: ', data.body)
+                const res = await loadInitialMessages(gatheringId);
+                setMessages(res.data.body || []);  
+                console.log('res.data.body: ', res.data.body)
   
             } catch (error) {
                 console.error('메시지 로드 실패:', error);
@@ -30,7 +37,7 @@ const ChatMessage = () =>{
 
         fetchMessages(); // 초기 메시지 가져오기
 
-        ws.current = new WebSocket(`wss://wqubv9jjq5.execute-api.ap-northeast-2.amazonaws.com/production?gathering_id=${gatheringId}&member_id=${memberId}`)
+        ws.current = connectWebSocket(gatheringId);
     
         ws.current.onopen = () => {
             console.log('WebSocket connected')
@@ -59,12 +66,27 @@ const ChatMessage = () =>{
         }
         },[gatheringId, memberId])
 
+        // const handleLoadMore = async () => {
+        //   const lastRegDate = messages[0].reg_date;
+        //   const olderMessages = await loadOlderMessages(gatheringId, lastRegDate);
+        //   console.log("olderMessages:",olderMessages)
+        //   setMessages((prev) => [...olderMessages, ...prev]);
+        // };
+        //     // 스크롤 이벤트로 스크롤이 맨 위에 도달했을 때 이전 메시지 로드
+        // const handleScroll = () => {
+        //   if (messagesContainerRef.current) {
+        //       const container = messagesContainerRef.current;
+        //       if (container.scrollTop === 0) {
+        //           handleLoadMore();
+        //       }
+        //   }
+        // };
 
         const sendMessage = () => {
             if (messageInput.trim()) {
             const message = {
                 gathering_id: gatheringId, 
-                member_id: memberId,
+                member_id: user.userId,
                 message: messageInput,
             };
             // WebSocket을 통해 메시지 전송
@@ -76,13 +98,23 @@ const ChatMessage = () =>{
             }
         }
 
-
+        //메세지 로드시 스크롤 밑으로 내리는 기능
         useEffect(() => {
             if (messagesEndRef.current) {
                 messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
             }
         }, [messages]);
 
+        // Enter 키 누르면 메세지 전송
+        const handleKeyDown = (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // 줄바꿈 방지
+            if (messageInput.trim() !== '') {
+              sendMessage(); // 메시지 전송
+            }
+          }
+        };
+        
           
 
 
@@ -91,10 +123,12 @@ const ChatMessage = () =>{
               <div className="max-w-4xl mx-auto p-6 font-sans">
                 <h1 className="text-center text-2xl font-bold mb-4">채팅</h1>
           
-                <div className="border border-gray-300 rounded-lg p-4 h-[600px] overflow-y-auto bg-gray-100 mb-4">
-                  {
-                    messages.map((msg, index) => {
-                      const isMine = msg.member_id == memberId;
+                <div className="border border-gray-300 rounded-lg p-4 h-[600px] overflow-y-auto bg-gray-100 mb-4"
+                      // ref={messagesContainerRef} // 메시지 컨테이너에 ref 추가
+                      // onScroll={handleScroll} // 스크롤 이벤트 추가
+                      >
+                  {messages.map((msg, index) => {
+                      const isMine = msg.member_id == user.userId;
           
                       return (
                         <div
@@ -109,7 +143,7 @@ const ChatMessage = () =>{
                               </span>
                               <div className="flex items-end">
                                 <img
-                                  src={msg.file_path}
+                                  src={msg.profileImageUrl}
                                   alt={msg.nickname}
                                   className="w-9 h-9 rounded-full mr-3"
                                 />
@@ -154,6 +188,7 @@ const ChatMessage = () =>{
                     type="text"
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="메시지를 입력하세요"
                     className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-base"
                   />

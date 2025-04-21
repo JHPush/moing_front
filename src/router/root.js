@@ -1,6 +1,8 @@
 import { Suspense, lazy } from "react";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
-const { createBrowserRouter } = require("react-router-dom");
+import moimRouter from "./moingRouter";
+
 
 const Loading = <div>Loading....</div>
 const Main = lazy(() => import("../pages/MainPage"))
@@ -8,10 +10,24 @@ const ChatMessage = lazy(() => import ("../components/Message/ChatMessage"))
 const SearchGroup = lazy(() => import ("../components/Main/SearchGroup"))
 const CreateMoimPage = lazy(()=>import("../pages/CreateMoimPage"))
 const IntroductionMoimPage = lazy(()=>import("../pages/IntroductionMoimPage"))
-
+const LoginPage = lazy(() => import("../components/menus/LoginPage"));
+const SignupPage = lazy(() => import("../components/menus/SignupPage"));
+const InviteMoim = lazy(() => import("../components/moim/InviteMoim"));
 
 const root = createBrowserRouter([
 
+  {
+    path: "/login",
+    element: <Suspense fallback={Loading}><LoginPage /></Suspense>,
+  },
+  {
+    path: "/signup",
+    element: <Suspense fallback={Loading}><SignupPage /></Suspense>,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" />,
+  },
   {
     path: "",
     element: <Suspense fallback={Loading}><Main/></Suspense>
@@ -30,8 +46,13 @@ const root = createBrowserRouter([
     element: <Suspense fallback={Loading}><CreateMoimPage/></Suspense>
   },
   {
-    path: "/introduct-moim",
-    element: <Suspense fallback={Loading}><IntroductionMoimPage/></Suspense>
+    path: "introduct-moim/:moimid",
+    element: <Suspense fallback={Loading}><IntroductionMoimPage/></Suspense>,
+    children: moimRouter()
+  },
+  {
+    path: "invite-moim",
+    element: <Suspense fallback={Loading}><InviteMoim/></Suspense>
   }
 
 

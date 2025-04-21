@@ -1,22 +1,27 @@
 import axios from "axios"
 
-const PREFIX_URL = 'https://4nfxslyaig.execute-api.ap-northeast-2.amazonaws.com/dev'
-const MOING_API_URL = '/moing'
-const MOING_PRESIGN_URL = '/sign'
+const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev'
+const MOING_API_URL = '/moing/detail'
+const MOING_PRESIGN_URL_PUT = '/sequre/puts'
+const MOING_PRESIGN_URL_GET = '/sequre/gets'
 
-export const getPresignedURL = async (name, type)=>{
-    console.log(`${PREFIX_URL+MOING_PRESIGN_URL}`, {
+export const getPresignedURL_put = async (name, type)=>{
+    console.log(`${PREFIX_URL+MOING_PRESIGN_URL_PUT}`, {
         params: {
           filename: name,
           filetype: type
         }
       });
 
-    return (await axios.get(`${PREFIX_URL+MOING_PRESIGN_URL}`, {params:{
+    return (await axios.get(`${PREFIX_URL+MOING_PRESIGN_URL_PUT}`, {params:{
         'filename': name,
         'filetype': type
     }})).data.body;
 }
+export const getPresignedURL_get = async (fileurl)=>{
+    return (await axios.get(`${PREFIX_URL+MOING_PRESIGN_URL_GET}`, {params:{'fileurl':fileurl}})).data;
+}
+
 
 export const putUploadMoimProfile = async (url, file)=>{
     return (await axios.put(`${url}`, file, {
@@ -29,4 +34,26 @@ export const putUploadMoimProfile = async (url, file)=>{
 export const postCreateMoing = async(form)=>{
     const headers = {'Content-Type': 'application/json'};
     return (await axios.post(`${PREFIX_URL+MOING_API_URL}`, form, {headers})).data;
+}
+
+export const getInvitation = async (moimid)=>{
+    const response = await axios.get(`${PREFIX_URL+MOING_API_URL}/invitation`, {params:{moimid: moimid }}) 
+    
+    console.log('response:', response)
+    return response.data.body;
+}
+
+export const postSendEmail = async (moimid, email)=>{
+    const response = await axios.post(`${PREFIX_URL + MOING_API_URL}/invitation`, {
+        moimid: moimid,
+        email: email,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      console.log('response:', response)
+      
+      return response;
+     
 }

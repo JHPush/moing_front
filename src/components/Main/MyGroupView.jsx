@@ -1,12 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import '../../css/GroupBox.css' 
 
 const MyGroupView = ()=>{
 
     const [gatherings, setGatherings] = useState([]);
    
-
+    const user = useSelector((state) => state.user.user)
+    console.log('user:', user)
     const getMyGroup = async () =>{
         const res = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups/mine`);
 

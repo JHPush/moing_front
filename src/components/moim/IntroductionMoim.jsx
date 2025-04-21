@@ -3,8 +3,16 @@ import ProfileCard from "./component/ProfileCard";
 import IntroductionCard from "./component/IntroductionCard";
 import NoticeCard from "./component/NoticeCard";
 import ActivityCard from "./component/ActivityCard";
+import { useParams, useNavigate } from "react-router-dom";
 
 const IntroductionMoim = () => {
+    const {moimid} = useParams()
+    const navigate = useNavigate();
+
+    const MoveToInvite = () =>{
+        navigate(`/invite-moim?moim_id=${moimid}`)
+    }
+
     return (
         <div className="w-full min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
@@ -13,6 +21,9 @@ const IntroductionMoim = () => {
                     <ProfileCard />
                     <button className="w-full bg-blue-500 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-600 shadow">
                         모임 가입하기
+                    </button>
+                    <button onClick={MoveToInvite} className="w-full bg-blue-500 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-600 shadow">
+                        모임 초대하기
                     </button>
                 </div>
 
