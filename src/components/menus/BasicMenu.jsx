@@ -54,7 +54,7 @@ const BasicMenu = () => {
             </div>
           </li>
           <li className="pr-6 text-2xl">
-            <Link to={`/chat/1?memberId=4f38aabb-98b3-4a4d-a2ff-6ed7302df000`}>ChatMessage</Link>
+            <Link to={`/chat/1`}>ChatMessage</Link>
           </li>
           <li className="pr-6 text-2xl">
           <button name="/create-moim" onClick={checkLogin}>모임 생성</button> 

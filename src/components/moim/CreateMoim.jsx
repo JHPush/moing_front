@@ -185,7 +185,7 @@ const CreateMoim = () => {
                     <h2 className="text-left text-xl font-semibold text-gray-800 mb-4">주제를 선택하세요</h2>
 
                     <div className="flex flex-wrap gap-3">
-                        {['등산', '낚시', '스터디', '게임', '맛집탐방', '영화', '운동', '사진', '반려동물', '요리', '코딩', '드라이브', '여행', '음악', '책'].map((item) => (
+                        {['레저', '스포츠', '문화예술', '스터디', '음식', '취미'].map((item) => (
                             <button
                                 key={item}
                                 className={`px-4 py-2 rounded-full text-sm transition-all duration-200 shadow-sm

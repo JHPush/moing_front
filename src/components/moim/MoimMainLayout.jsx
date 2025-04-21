@@ -5,13 +5,14 @@ import ProfileCard from "./component/moim/ProfileCard";
 import MoimPostView from "./component/post/MoimPostView";
 import MoimPostCard from "./component/post/MoimPostCard";
 import { getAllPostByMoimId } from "../../api/moimAPI";
+import { useNavigate } from "react-router-dom";
 
 
 const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
     const [isOpenPost, setIsOpenPost] = useState(false)
     const [activeTab, setActiveTab] = useState("home");
     const [selectedPost, setSelectedPost] = useState(null); // 게시글 상세 보기용
-
+    const nav = useNavigate()
 
     return (
         <div className="bg-gray-50 min-h-screen py-6 px-4 flex justify-center font-[Pretendard]">
@@ -47,7 +48,7 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                         <div className="text-sm space-y-2 pl-2">
                             <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
                             <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
-                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline">
+                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> nav(`/invite-moim?moimid=${moim.id}`)}>
                                 <svg
                                     className="w-4 h-4"
                                     fill="none"

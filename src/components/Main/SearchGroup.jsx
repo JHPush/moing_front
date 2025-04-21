@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {  useNavigate, useSearchParams } from "react-router-dom";
 import keywordMap from "../../utils/keywordMap";
 import '../../css/GroupBox.css' 
 import '../../css/SearchBox.css' 
@@ -9,15 +9,19 @@ const SearchGroup = () => {
 
     const [gatherings, setGatherings] = useState([])
     const[searchParams]= useSearchParams();
-    const location = useLocation();
+    const [keyword, setKeyword] = useState('');
     const navigate = useNavigate();
 
-    const [keyword, setKeyword] = useState('');
-
     const keywordParam = searchParams.get('keyword') || '';
+    
     useEffect(() => {
 
       setKeyword(keywordParam);
+
+      if (!keywordParam.trim()) {
+        setGatherings([]);
+        return;
+      }
 
       const mappedKeywords = keywordMap[keywordParam] || [keywordParam];
 
@@ -35,8 +39,7 @@ const SearchGroup = () => {
       }
     }
       fetchData();
-      }, [searchParams]);
-
+      }, [keywordParam]);
 
       const handleSearch = (e) =>{
         e.preventDefault();

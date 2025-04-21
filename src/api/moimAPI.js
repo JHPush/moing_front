@@ -77,3 +77,25 @@ export const updateMoimPost = async(form)=>{
     const headers = {'Content-Type': 'application/json'}
     return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form, {headers})).data
 }
+
+export const getInvitation = async (moimid)=>{
+    const response = await axios.get(`${PREFIX_URL+MOING_API_URL}/invitation`, {params:{moimid: moimid }}) 
+    
+    console.log('response:', response)
+    return response.data.body;
+}
+
+export const postSendEmail = async (moimid, email)=>{
+    const response = await axios.post(`${PREFIX_URL + MOING_API_URL}/invitation`, {
+        moimid: moimid,
+        email: email,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      console.log('response:', response)
+      
+      return response;
+     
+}
