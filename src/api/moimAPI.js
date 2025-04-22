@@ -97,5 +97,29 @@ export const postSendEmail = async (moimid, email)=>{
       console.log('response:', response)
       
       return response;
-     
+}
+
+export const getUserLocation = ()=>{
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+      
+        } else {
+            reject(new Error("Geolocation is not supported by this browser."));
+        }
+    });
+}
+
+export const searchLocationApi = async (keyword) => {
+    if (!keyword.trim()) return;
+
+    const res = await axios.get(`https://dapi.kakao.com/v2/local/search/keyword.json`, {
+        params: {
+            query: keyword
+        },
+        headers: {
+            Authorization: `KakaoAK ${process.env.REACT_APP_KAKAO_API_KEY}`, // 환경변수로 API 키 설정
+        }}
+    )
+    return res.data.documents
 }

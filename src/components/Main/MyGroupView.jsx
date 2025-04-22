@@ -8,7 +8,7 @@ const MyGroupView = ()=>{
     const [gatherings, setGatherings] = useState([]);
    
     const user = useSelector((state) => state.user.user)
-    console.log('user:', user)
+    // console.log('user:', user)
     const getMyGroup = async () =>{
         const res = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups/mine`);
 

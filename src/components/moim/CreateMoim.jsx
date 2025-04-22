@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getPresignedURL_put, postCreateMoing, putUploadMoimProfile } from '../../api/moimAPI';
-import SelectLocation from './SelectLocation';
+import SelectLocation from './MoimSelectLocation';
 import { hangjungdong } from "../../assets/data/hangjungdong"
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,9 @@ const initMoimForm = {
     region: '',
     // gender:'',
     // age:''
-    snapshot: ''
+    snapshot: '',
+    x:'',
+    y:''
 }
 
 const CreateMoim = () => {
@@ -28,12 +30,10 @@ const CreateMoim = () => {
     const [showLocationModal, setShowLocationModal] = useState(false);
 
     const handleSelectLocation = (e) => {
-        // setMoim({ ...moim, ['region']: sido === e[0] + sigugun.find(e[1]).codeNm + dong.find(e[2]).codeNm })
-        const _dong = dong.find(item => item.sido === e[0] && item.sigugun === e[1] && item.dong === e[2]).codeNm
-        setMoim({ ...moim, ['region']: _dong })
-        console.log(moim.region)
+        setMoim({ ...moim, ['region']: e.address_name, x:e.x, y:e.y })
 
         setShowLocationModal(false);
+        console.log(moim)
     }
 
     const convertUrlToFile = async (url) => {

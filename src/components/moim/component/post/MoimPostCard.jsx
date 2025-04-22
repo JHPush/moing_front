@@ -15,7 +15,8 @@ const MoimPostCard = ({ post, onSelectPost }) => {
             {isSchedule && (
                 <div className="bg-blue-50 border border-blue-200 rounded-md px-3 py-2 text-sm text-blue-700">
                     <p className="font-semibold">📅 모임이 있습니다!</p>
-                    <p className="mt-1">모임 일자: <span className="font-medium">{post.schedule}</span></p>
+                    <p className="mt-1">일자: <span className="font-medium">{post.schedule}</span></p>
+                    <p className="mt-1">장소: <span className="font-medium">{post.moim_addr}</span></p>
                 </div>
             )}
 

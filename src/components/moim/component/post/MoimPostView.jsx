@@ -3,14 +3,29 @@ import { deleteMoimPost, updateMoimPost } from '../../../../api/moimAPI';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import dayjs from 'dayjs';
+import MoimLocationModal from '../util/MoimPostLocationModal';
 
 const MoimPostView = ({ post, user, onBack, updatePost }) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [showLocationModal, setShowLocationModal] = useState(false);
     const [editData, setEditData] = useState({
         title: post.title,
         content: post.content,
         schedule: post.schedule,
+        moim_addr: post.moim_addr || '',
+        moim_x: post.moim_x || '',
+        moim_y: post.moim_y || '',
     });
+    
+    // 3. 장소 선택 핸들러 추가
+    const handleLocationSelect = (addr) => {
+        setEditData({
+            ...editData,
+            moim_addr: addr.selectedAddress,
+            moim_x: addr.coord.x,
+            moim_y: addr.coord.y,
+        });
+    };
 
     const isAuthor = user?.userId === post.member_id;
     const isSchedule = post.post_type === 'Scheduled';
@@ -27,17 +42,22 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
     };
 
     const handleOnUpdate = () => {
+        console.log(editData)
         updateMoimPost({
             moim_id: post.gathering_id,
             id: post.id,
             title: editData.title,
             content: editData.content,
             schedule: editData.schedule,
+            moim_addr: editData.moim_addr,
+            moim_x: editData.moim_x,
+            moim_y: editData.moim_y,
         }).then(data => {
-            if(data.statusCode !== 200){
-            alert('수정 실패!')
-            return
-        }
+            if (data.statusCode !== 200) {
+                console.log(data)
+                alert('수정 실패!')
+                return
+            }
             updatePost()
             alert('업데이트 성공');
             onBack();
@@ -51,7 +71,7 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
             moim_id: post.gathering_id,
             id: post.id,
         }).then(data => {
-            if(data.statusCode !== 200){
+            if (data.statusCode !== 200) {
                 alert('삭제 실패!')
                 return
             }
@@ -86,20 +106,48 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                             onChange={handleChange}
                         />
                         {isSchedule && (
-                            <div className="mb-4">
-                                <label className="text-sm text-gray-600 block mb-1">모임 일자</label>
-                                <DatePicker
-                                    selected={editData.schedule ? new Date(editData.schedule) : null}
-                                    onChange={handleDateChange}
-                                    showTimeSelect
-                                    timeFormat="HH:mm"
-                                    timeIntervals={30}
-                                    dateFormat="yyyy-MM-dd HH:mm"
-                                    timeCaption="시간"
-                                    className="w-full border rounded px-3 py-2 text-sm"
-                                />
-                            </div>
+                            <>
+                                {/* 일정 선택 */}
+                                <div className="mb-4">
+                                    <label className="text-sm text-gray-600 block mb-1">모임 일자</label>
+                                    <DatePicker
+                                        selected={editData.schedule ? new Date(editData.schedule) : null}
+                                        onChange={handleDateChange}
+                                        showTimeSelect
+                                        timeFormat="HH:mm"
+                                        timeIntervals={30}
+                                        dateFormat="yyyy-MM-dd HH:mm"
+                                        timeCaption="시간"
+                                        className="w-full border rounded px-3 py-2 text-sm"
+                                    />
+                                </div>
+
+                                {/* 장소 선택 */}
+                                <div className="mb-4">
+                                    <label className="text-sm text-gray-600 block mb-1">모임 장소</label>
+                                    <div className="flex gap-2 items-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowLocationModal(true)}
+                                            className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                                        >
+                                            📍 장소 선택
+                                        </button>
+                                        {editData.moim_addr && (
+                                            <span className="text-sm text-green-600">{editData.moim_addr}</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {showLocationModal && (
+                                    <MoimLocationModal
+                                        onClose={() => setShowLocationModal(false)}
+                                        onSelect={handleLocationSelect}
+                                    />
+                                )}
+                            </>
                         )}
+
                         <textarea
                             name="content"
                             className="flex-1 text-base text-gray-700 border rounded-md p-3 h-64 resize-none"
@@ -134,6 +182,9 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                                 </p>
                                 <p className="ml-6 mt-1">
                                     모임 일자: <span className="font-medium">{post.schedule}</span>
+                                </p>
+                                <p className="ml-6 mt-1">
+                                    장소: <span className="font-medium">{post.moim_addr}</span>
                                 </p>
                             </div>
                         )}

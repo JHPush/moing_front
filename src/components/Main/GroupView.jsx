@@ -18,9 +18,9 @@ const GroupView = () => {
 
         const data = await getAllGroup(category);
         const groupList = JSON.parse(data);
-        console.log("category: ", category)
+        // console.log("category: ", category)
         setGatherings(groupList);
-        console.log("groupList:", groupList)
+        // console.log("groupList:", groupList)
       
 
     }
