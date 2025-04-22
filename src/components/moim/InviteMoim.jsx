@@ -3,14 +3,14 @@ import axios from "axios";
 import { getInvitation, postSendEmail } from "../../api/moimAPI";
 import {  useSearchParams } from "react-router-dom";
 
-const InviteMoim = () => {
+const InviteMoim = ({moim_id}) => {
   const [qrUrl, setQrUrl] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
   const [email, setEmail] = useState('');
-  const[searchParams]= useSearchParams();
+  // const[searchParams]= useSearchParams();
 
 
-  const moimid = searchParams.get("moimid");
+  const moimid = moim_id;
 
 
   useEffect(() => {

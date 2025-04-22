@@ -4,7 +4,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import dayjs from 'dayjs';
 import MoimLocationModal from '../util/MoimPostLocationModal';
+import MoimPostViewMap from './MoimPostViewMap';
 
+// 게시글 보기 수정 삭제 카드
 const MoimPostView = ({ post, user, onBack, updatePost }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(false);
@@ -152,19 +154,16 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                             name="content"
                             className="flex-1 text-base text-gray-700 border rounded-md p-3 h-64 resize-none"
                             value={editData.content}
-                            onChange={handleChange}
-                        />
+                            onChange={handleChange}/>
                         <div className="mt-4 flex justify-end gap-2">
                             <button
                                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
-                                onClick={() => setIsEditing(false)}
-                            >
+                                onClick={() => setIsEditing(false)}>
                                 취소
                             </button>
                             <button
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                                onClick={handleOnUpdate}
-                            >
+                                onClick={handleOnUpdate}>
                                 저장
                             </button>
                         </div>
@@ -181,11 +180,16 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                                     📅 <span>모임이 있습니다!</span>
                                 </p>
                                 <p className="ml-6 mt-1">
-                                    모임 일자: <span className="font-medium">{post.schedule}</span>
+                                   날자: <span className="font-medium">{post.schedule}</span>
                                 </p>
                                 <p className="ml-6 mt-1">
                                     장소: <span className="font-medium">{post.moim_addr}</span>
                                 </p>
+                                {post.moim_addr && post.moim_x &&(
+                                    <div className='mb-6'>
+                                        <MoimPostViewMap x={post.moim_x} y={post.moim_y} addr={post.moim_addr}/>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -202,14 +206,12 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                             <div className="mt-4 flex justify-end gap-2">
                                 <button
                                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm"
-                                    onClick={() => setIsEditing(true)}
-                                >
+                                    onClick={() => setIsEditing(true)}>
                                     ✏️ 수정
                                 </button>
                                 <button
                                     className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded text-sm"
-                                    onClick={handleOnDelete}
-                                >
+                                    onClick={handleOnDelete}>
                                     🗑️ 삭제
                                 </button>
                             </div>

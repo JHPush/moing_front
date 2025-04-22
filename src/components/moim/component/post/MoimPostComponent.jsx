@@ -3,6 +3,7 @@ import MoimPostWriteCard from "./MoimPostWriteCard";
 import MoimPostCard from "./MoimPostCard";
 import { getAllPostByMoimId } from "../../../../api/moimAPI";
 
+// 뿌려주는 부분
 const MoimPostComponent = ({ moim, user, isOpenPost, onSelectPost, posts, onPostCreated }) => {
     return (
         <main className="col-span-2 space-y-4">

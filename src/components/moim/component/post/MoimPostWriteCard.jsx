@@ -15,12 +15,15 @@ const initState = {
     moim_x: "",
     moim_y: "",
 };
-
+// 게시글 작성
 const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
     const [post, setPost] = useState({ ...initState });
     const [selectedDate, setSelectedDate] = useState(null);
     const [showSchedule, setShowSchedule] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(false);
+    const [imageFiles, setImageFiles] = useState([])
+    const [previewFiles, setPreviewFiles] = useState([])
+    const [imageUrls, setImageUrls] = useState([])
 
     const datePickerRef = useRef(null);
 
@@ -51,6 +54,20 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
     }, []);
 
 
+    const handleOnFile = (e)=>{
+        const files = Array.from(e.target.files);
+        if(files.length > 3){
+            alert('최대 3개의 파일까지만 등록 가능합니다')
+            return;
+        }
+        setImageFiles(files)
+        
+        const previews = files.map(file=>URL.createObjectURL(file))
+        setPreviewFiles(previews)
+        
+    }
+
+
     const handleOnRegister = () => {
         const ptype = selectedDate ? "Scheduled" : "Normal";
         const finalPost = {
@@ -59,7 +76,7 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             post_type: post.post_type === "Notice" ? post.post_type : ptype,
         };
 
-        console.log(finalPost);
+
 
         if (finalPost.title === '' || finalPost.content === '') {
             alert("모두 작성해주세요");
@@ -187,9 +204,17 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             ></textarea>
 
             {/* 툴 */}
-            <div className="flex justify-center items-center space-x-4 text-gray-500">
-                <span className="cursor-pointer">📷사진 등록</span>
-            </div>
+            <label className="flex justify-center items-center space-x-4 text-gray-500 cursor-pointer">
+            📷사진 등록
+            <input type="file" name="snapshot" multiple className="hidden" onChange={handleOnFile} accept="image/*" />
+            </label>
+            {previewFiles.length> 0 &&(
+                <div className="flex flex-wrap gap-2 mt-2">
+                    {previewFiles.map((url, idx)=>{
+                         return(<img key={idx} src={url} alt="미리보기" className="w-24 h-24 object-cover rounded-md" />)
+                    })}
+                    </div>
+            )}
 
             {/* 등록 버튼 */}
             <button

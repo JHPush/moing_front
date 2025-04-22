@@ -1,3 +1,5 @@
+// 게시글 목록 뿌릴 때 쓰는 카드
+
 const MoimPostCard = ({ post, onSelectPost }) => {
     const isSchedule = post.post_type === 'Scheduled';
 

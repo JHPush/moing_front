@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import MoimPostComponent from "./component/post/MoimPostComponent";
 import MoimRecentPostCard from "./component/moim/MoimRecentPostCard";
 import ProfileCard from "./component/moim/ProfileCard";
-import MoimPostView from "./component/post/MoimPostView";
+import MoimPostView from "./component/post/MoimPostViewCard";
 import MoimPostCard from "./component/post/MoimPostCard";
 import { getAllPostByMoimId } from "../../api/moimAPI";
 import { useNavigate } from "react-router-dom";
+import InviteMoim from "./InviteMoim";
 
 
 const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
@@ -48,7 +49,7 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                         <div className="text-sm space-y-2 pl-2">
                             <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
                             <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
-                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> nav(`/invite-moim?moimid=${moim.id}`)}>
+                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> setActiveTab('inviteMember')}>
                                 <svg
                                     className="w-4 h-4"
                                     fill="none"
@@ -77,11 +78,12 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                         {/* {activeTab === "photo" && <PhotoGallery moim={moim} />} */}
                         {/* {activeTab === "schedule" && <ScheduleComponent moim={moim} />} */}
                         {/* {activeTab === "member" && <MemberList moim={moim} />} */}
+                        {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id}/> }
                         {activeTab === "postDetail" && selectedPost && (
                             <MoimPostView user = {user} post={selectedPost} updatePost={handlePostCreated} onBack={() => setActiveTab("home")} />
                         )}
                     </div>
-                    <MoimRecentPostCard />
+                    <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post)=>{setSelectedPost(post); setActiveTab("postDetail");}} />
 
                 </div>
             </div>
