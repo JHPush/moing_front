@@ -4,8 +4,10 @@ const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/
 const MOING_API_URL = '/moing/detail'
 const MOING_JOIN_URI = '/join'
 const MOING_POST_URI = '/post'
+const MOING_GET_IMAGES_URI = '/post/images'
 const MOING_PRESIGN_URL_PUT = '/sequre/puts'
 const MOING_PRESIGN_URL_GET = '/sequre/gets'
+const MOING_POST_PRESIGN_URL_POST = '/sequre/post'
 
 export const getPresignedURL_put = async (name, type) => {
     console.log(`${PREFIX_URL + MOING_PRESIGN_URL_PUT}`, {
@@ -23,15 +25,28 @@ export const getPresignedURL_put = async (name, type) => {
     })).data.body;
 }
 
+
+export const getPresignedURL_PostPut = async (urls) =>{
+    return (await axios.post(`${PREFIX_URL + MOING_POST_PRESIGN_URL_POST}`, urls, {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }));
+}
+
+export const getAllPostImages = async (moim_id, bucketName)=>{
+    return (await axios.get(`${PREFIX_URL +MOING_API_URL+ MOING_GET_IMAGES_URI}`, {params: {'moim_id' : moim_id, 'bucket':bucketName}})).data.body
+}
+
 export const getAllPostByMoimId = async(moim_id)=>{
     return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, {params: {'moim_id' : moim_id}})).data.body
 }
 
-export const getPresignedURL_get = async (fileurl) => {
-    return (await axios.get(`${PREFIX_URL + MOING_PRESIGN_URL_GET}`, { params: { 'fileurl': fileurl } })).data;
+export const getPresignedURL_get = async (fileurl, bucketName) => {
+    return (await axios.get(`${PREFIX_URL + MOING_PRESIGN_URL_GET}`, { params: { 'fileurl': fileurl, 'bucket':bucketName } })).data;
 }
 
-export const getMoimProfileImage = async (url) => {
+export const getMoimImageByPresignedUrl = async (url) => {
     return (await axios.get(url, { responseType: 'blob' })).data;
 }
 
@@ -45,10 +60,10 @@ export const putJoinMoim = async (moimId, moimCategory, userId) => {
 };
 
 
-export const putUploadMoimProfile = async (url, file) => {
+export const putUploadMoimImageByPresignedUrl = async (url, file) => {
     return (await axios.put(`${url}`, file, {
         headers: {
-            'Content-Type': file.type || 'application/octet-stream', // 파일의 MIME 타입을 명시적으로 설정
+            'Content-Type': file.type || 'application/octet-stream', 
         },
     }));
 }
@@ -60,6 +75,7 @@ export const postCreateMoing = async (form) => {
 
 
 export const postMoimPost = async(form)=>{
+    console.log('form : ', form)
     const headers = {'Content-Type': 'application/json'}
     return (await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form ,{headers})).data
 }

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { postMoimPost } from "../../../../api/moimAPI";
+import { getPresignedURL_PostPut, postMoimPost, putUploadMoimImageByPresignedUrl } from "../../../../api/moimAPI";
 import DatePicker from "react-datepicker";
 import MoimLocationModal from "../util/MoimPostLocationModal";
+import { convertUrlsToFiles } from "../../../../utils/fileUtils";
 
 const initState = {
     moim_id: "",
@@ -14,6 +15,7 @@ const initState = {
     moim_addr: "",
     moim_x: "",
     moim_y: "",
+    files: []
 };
 // 게시글 작성
 const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
@@ -24,6 +26,7 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
     const [imageFiles, setImageFiles] = useState([])
     const [previewFiles, setPreviewFiles] = useState([])
     const [imageUrls, setImageUrls] = useState([])
+
 
     const datePickerRef = useRef(null);
 
@@ -54,21 +57,22 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
     }, []);
 
 
-    const handleOnFile = (e)=>{
+    const handleOnFile = (e) => {
+
         const files = Array.from(e.target.files);
-        if(files.length > 3){
+        if (files.length > 3) {
             alert('최대 3개의 파일까지만 등록 가능합니다')
             return;
         }
         setImageFiles(files)
-        
-        const previews = files.map(file=>URL.createObjectURL(file))
+
+        const previews = files.map(file => URL.createObjectURL(file))
         setPreviewFiles(previews)
-        
+
     }
 
 
-    const handleOnRegister = () => {
+    const handleOnRegister = async () => {
         const ptype = selectedDate ? "Scheduled" : "Normal";
         const finalPost = {
             ...post,
@@ -76,28 +80,48 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             post_type: post.post_type === "Notice" ? post.post_type : ptype,
         };
 
-
-
         if (finalPost.title === '' || finalPost.content === '') {
             alert("모두 작성해주세요");
             return;
         }
-        if (showSchedule &&  (selectedDate === null || finalPost.moim_addr === '' || finalPost.moim_x === '')) {
+        if (showSchedule && (selectedDate === null || finalPost.moim_addr === '' || finalPost.moim_x === '')) {
             console.log(post)
             alert("일정 혹은 모임 위치를 등록해주세요");
             return;
         }
 
-        postMoimPost(finalPost)
-            .then((data) => {
-                console.log(data)
-                alert("게시글 등록 완료!");
-                onPostCreated();
-            })
-            .catch((e) => {
-                console.error("error : ", e);
-            });
-    };
+        if (imageFiles.length > 0) {
+            try {
+                setImageUrls([])
+                const requestData = imageFiles.map(file => ({
+                    filename: file.name,
+                    filetype: file.type
+                }))
+
+                const res = await getPresignedURL_PostPut(requestData);
+                const data = JSON.parse(res.data.body)
+
+                const uploadPromises = data.map(async (file, idx) => {
+                    await putUploadMoimImageByPresignedUrl(file.uploadUrl, imageFiles[idx]);
+                    return file.fileUrl;
+                  });
+                  
+
+                const uploadUrls = await Promise.all(uploadPromises)
+                console.log('uploadUrls : ', uploadUrls)
+                finalPost.files = uploadUrls;
+
+                const finalRes = await postMoimPost(JSON.stringify(finalPost));
+                console.log('게시글 등록 결과 : ', finalRes)
+                alert('게시글 등록 완료')
+                onPostCreated()
+            }
+            catch(error){
+                console.error('Error Upload or Post', error)
+                alert('에러 발생')
+            }
+        }
+    }
 
     return (
         <div className="space-y-3">
@@ -179,7 +203,7 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
                     {showLocationModal && (
                         <MoimLocationModal
                             onClose={() => setShowLocationModal(false)}
-                            onSelect={(addr) => setPost({...post, moim_addr:addr.selectedAddress, moim_x:addr.coord.x, moim_y:addr.coord.y})}
+                            onSelect={(addr) => setPost({ ...post, moim_addr: addr.selectedAddress, moim_x: addr.coord.x, moim_y: addr.coord.y })}
                         />
                     )}
                 </div>
@@ -205,15 +229,15 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
 
             {/* 툴 */}
             <label className="flex justify-center items-center space-x-4 text-gray-500 cursor-pointer">
-            📷사진 등록
-            <input type="file" name="snapshot" multiple className="hidden" onChange={handleOnFile} accept="image/*" />
+                📷사진 등록
+                <input type="file" name="snapshot" multiple className="hidden" onChange={handleOnFile} accept="image/*" />
             </label>
-            {previewFiles.length> 0 &&(
+            {previewFiles.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                    {previewFiles.map((url, idx)=>{
-                         return(<img key={idx} src={url} alt="미리보기" className="w-24 h-24 object-cover rounded-md" />)
+                    {previewFiles.map((url, idx) => {
+                        return (<img key={idx} src={url} alt="미리보기" className="w-24 h-24 object-cover rounded-md" />)
                     })}
-                    </div>
+                </div>
             )}
 
             {/* 등록 버튼 */}

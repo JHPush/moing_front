@@ -5,14 +5,19 @@ const MoimPostCard = ({ post, onSelectPost }) => {
 
     return (
         <div
-            className="bg-white rounded-2xl shadow-md p-4 space-y-3 hover:shadow-lg transition-all duration-200 cursor-pointer"
+            className="relative bg-white rounded-2xl shadow-md p-4 space-y-3 hover:shadow-lg transition-all duration-200 cursor-pointer"
             onClick={() => onSelectPost?.(post)}
         >
-            {/* 제목 */}
-            <h3 className="text-lg font-semibold text-gray-800 truncate">
-                {post.title}
-            </h3>
-
+            {/* 오른쪽 상단 아이콘 */}
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    {post.title}
+                </h3>
+                {post.files.length>0?<div className="flex items-center space-x-1 text-gray-500 text-sm flex-shrink-0 ml-2">
+                    <span>📷</span>
+                </div>:<></>}
+                
+            </div>
             {/* 모임 일정 안내 (있을 때만) */}
             {isSchedule && (
                 <div className="bg-blue-50 border border-blue-200 rounded-md px-3 py-2 text-sm text-blue-700">
@@ -34,6 +39,7 @@ const MoimPostCard = ({ post, onSelectPost }) => {
             </div>
         </div>
     );
+
 };
 
 export default MoimPostCard;

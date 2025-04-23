@@ -3,8 +3,6 @@ import MoimPostComponent from "./component/post/MoimPostComponent";
 import MoimRecentPostCard from "./component/moim/MoimRecentPostCard";
 import ProfileCard from "./component/moim/ProfileCard";
 import MoimPostView from "./component/post/MoimPostViewCard";
-import MoimPostCard from "./component/post/MoimPostCard";
-import { getAllPostByMoimId } from "../../api/moimAPI";
 import { useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
 

@@ -18,7 +18,7 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
         moim_x: post.moim_x || '',
         moim_y: post.moim_y || '',
     });
-    
+
     // 3. 장소 선택 핸들러 추가
     const handleLocationSelect = (addr) => {
         setEditData({
@@ -154,7 +154,7 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                             name="content"
                             className="flex-1 text-base text-gray-700 border rounded-md p-3 h-64 resize-none"
                             value={editData.content}
-                            onChange={handleChange}/>
+                            onChange={handleChange} />
                         <div className="mt-4 flex justify-end gap-2">
                             <button
                                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
@@ -180,23 +180,34 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                                     📅 <span>모임이 있습니다!</span>
                                 </p>
                                 <p className="ml-6 mt-1">
-                                   날자: <span className="font-medium">{post.schedule}</span>
+                                    날자: <span className="font-medium">{post.schedule}</span>
                                 </p>
                                 <p className="ml-6 mt-1">
                                     장소: <span className="font-medium">{post.moim_addr}</span>
                                 </p>
-                                {post.moim_addr && post.moim_x &&(
+                                {post.moim_addr && post.moim_x && (
                                     <div className='mb-6'>
-                                        <MoimPostViewMap x={post.moim_x} y={post.moim_y} addr={post.moim_addr}/>
+                                        <MoimPostViewMap x={post.moim_x} y={post.moim_y} addr={post.moim_addr} />
                                     </div>
                                 )}
+                            </div>
+                        )}
+                        {post.files && post.files.length > 0 && (
+                            <div className="grid grid-cols-3 gap-3 mb-6">
+                                {post.files.map((src, index) => (
+                                    <img
+                                        key={index}
+                                        src={src.presigned_url}
+                                        alt={`이미지 ${index + 1}`}
+                                        className="w-full aspect-square object-cover rounded-lg border"
+                                    />
+                                ))}
                             </div>
                         )}
 
                         <div className="flex-1 text-gray-700 leading-relaxed whitespace-pre-wrap mb-6 text-base">
                             {post.content}
                         </div>
-
                         <div className="border-t pt-4 text-xs text-gray-500 flex justify-between">
                             <p>✍️ 작성자: {post.member_name}</p>
                             <p>🕒 작성일: {post.reg_date}</p>

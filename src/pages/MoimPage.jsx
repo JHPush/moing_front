@@ -3,7 +3,7 @@ import BasicLayout from "../layouts/BasicLayout"
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import IntroductionMoim from "../components/moim/IntroductionMoim";
-import { getAllPostByMoimId, getMoim } from "../api/moimAPI";
+import { getAllPostByMoimId, getAllPostImages, getMoim } from "../api/moimAPI";
 import MoimMainLayout from "../components/moim/MoimMainLayout";
 
 const initMoimForm = {
@@ -27,44 +27,58 @@ const MoimPage = () => {
     const [posts, setPosts] = useState([]);
     const [reloadTrigger, setReloadTrigger] = useState(false)
 
-    const getMoimPosts = (id)=>{
-        console.log('게시글 등록 : ', id)
-        getAllPostByMoimId(id)
-        .then((data) => {
-            setPosts(JSON.parse(data));
-        })
-        .catch((e) => {
-            console.log("error : ", e);
-        });
-    }
-    const handlePostCreated = ()=>{
-        setReloadTrigger(!reloadTrigger)
-    }
+    const getMoimPosts = async (id) => {
+        let postRes = []
+        let postImgRes = []
+        let allPresignedImg = []
+        try {
+            postRes = JSON.parse(await getAllPostByMoimId(id));
+            postImgRes = JSON.parse(await getAllPostImages(id, 'moim-post-images'));
 
-    useEffect(() => {
-        if (moim.name === '') {
-            getMoim(id, category).then(data => {
-                const temp = JSON.parse(data.body)
-                setMoim(temp)
-                getMoimPosts(temp.id)
-            }).catch(e => {
-                console.log('get moim error : ', e)
-            })
+            await setPosts((prev) => {
+                return postRes.map(post => {
+                    const matchingImages = postImgRes.filter(img => img.post_id === post.id);
+
+                    const urls = matchingImages.flatMap(obj => obj.files.map(temp => temp.presigned_url));
+                    allPresignedImg.push(...urls);
+                    return {
+                        ...post,
+                        files: matchingImages.length > 0 ? matchingImages[0].files : []
+                    };
+                });
+            });
+        } catch (error) {
+            console.error("오류 발생:", error);
         }
-    }, [moim.id])
+}
+const handlePostCreated = () => {
+    setReloadTrigger(!reloadTrigger)
+}
 
-    useEffect(()=>{
-        getMoimPosts(id)
-    },[reloadTrigger])
+useEffect(() => {
+    if (moim.name === '') {
+        getMoim(id, category).then(data => {
+            const temp = JSON.parse(data.body)
+            setMoim(temp)
+            getMoimPosts(temp.id)
+        }).catch(e => {
+            console.log('get moim error : ', e)
+        })
+    }
+}, [moim.id])
 
-    return (
-        <BasicLayout>
-            {user && user.gatherings.find(id => id === moim.id) ? <MoimMainLayout moim={moim} user={user} posts={posts} handlePostCreated={handlePostCreated} /> : <IntroductionMoim moim={moim} user={user} />}
+useEffect(() => {
+    getMoimPosts(id)
+}, [reloadTrigger])
+
+return (
+    <BasicLayout>
+        {user && user.gatherings.find(id => id === moim.id) ? <MoimMainLayout moim={moim} user={user} posts={posts} handlePostCreated={handlePostCreated} /> : <IntroductionMoim moim={moim} user={user} />}
 
 
-            {/*  */}
-        </BasicLayout>
-    )
+        {/*  */}
+    </BasicLayout>
+)
 }
 
 export default MoimPage

@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { getMoimProfileImage, getPresignedURL_get } from "../../../../api/moimAPI";
+import { getMoimImageByPresignedUrl, getPresignedURL_get } from "../../../../api/moimAPI";
 
 const ProfileCard = ({ moim, user }) => {
-  const [moimProfile, setMoimProfile] = useState(null)
-  useEffect(() => {
-    if (!moimProfile) {
-      getPresignedURL_get(moim.file_url).then(data => {
-        const url = JSON.parse(data.body).download_url
-        getMoimProfileImage(url).then(data => {
-          setMoimProfile(URL.createObjectURL(data))
-        }).catch(e => {
-          console.log('error : ', e)
-        })
-      }).catch(e => {
+  const [moimProfile, setMoimProfile] = useState('')
 
+  useEffect(() => {
+    if (!moimProfile || moimProfile ==='') {
+      getPresignedURL_get(moim.file_url, 'moim-profiles').then(data => {
+        if(!data.body) return
+        const url = JSON.parse(data.body).download_url
+          setMoimProfile(url)
+      }).catch(e => {
+        console.error('error : ', e)
       })
     }
   }, [moim])
@@ -22,7 +20,7 @@ const ProfileCard = ({ moim, user }) => {
     <aside className="col-span-1 space-y-4">
       <div className="bg-white p-4 rounded-xl shadow-sm text-center">
         <div className="w-24 h-24 mx-auto bg-gray-300 rounded-lg mb-4">
-          {moimProfile ? (
+          {moimProfile!=='' ? (
             <img
               src={moimProfile}
               alt="Fetched Image"

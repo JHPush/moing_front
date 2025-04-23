@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { getPresignedURL_put, postCreateMoing, putUploadMoimProfile } from '../../api/moimAPI';
+import { getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
 import SelectLocation from './MoimSelectLocation';
 import { hangjungdong } from "../../assets/data/hangjungdong"
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { convertUrlToFile } from '../../utils/fileUtils';
 
 const { sido, sigugun, dong } = hangjungdong;
 
@@ -36,25 +37,6 @@ const CreateMoim = () => {
         console.log(moim)
     }
 
-    const convertUrlToFile = async (url) => {
-        try {
-            const response = await fetch(url); // URL에서 데이터 가져오기
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const blob = await response.blob(); // Blob 형태로 데이터 변환
-            const filename = url.split("/").pop()
-            const file = new File([blob], filename, { type: blob.type }); // Blob을 File 객체로 변환
-
-            return file; // 일반 파일 객체 반환
-        } catch (error) {
-            console.error("변환 실패:", error);
-        }
-    };
-
-
-
     const handleUpdateMoim = (e) => {
         setMoim({ ...moim, [e.target.name]: e.target.value })
     }
@@ -83,7 +65,7 @@ const CreateMoim = () => {
                     if (!checkDouble) {
                         checkDouble = true
                         console.log("Request S3 Start !! ")
-                        putUploadMoimProfile(temp['upload_url'], file).then(() => {
+                        putUploadMoimImageByPresignedUrl(temp['upload_url'], file).then(() => {
                             postCreateMoing(updateMoim).then(data => {
                                 if(data.statusCode !== 200){
                                     alert('모임 생성 실패')
