@@ -15,7 +15,7 @@ const BasicMenu = () => {
       nav(e.target.name)
       return;
     }
-    alert('로그인을 진행해주세여')
+    alert('로그인을 진행해주세요요')
     nav('', {replace:true})
   }
 
@@ -26,6 +26,7 @@ const BasicMenu = () => {
     removeCookie('refreshToken');
     localStorage.clear();
     dispatch(logoutUser());
+    nav("/", {replace:true})
   };
 
   return (
