@@ -47,8 +47,9 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                         <ProfileCard moim={moim} user={user} />
                         <div className="text-sm space-y-2 pl-2">
                             <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
+                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e=> nav(`/chat/${moim.id}`)}>채팅</button>
                             <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
-                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> nav(`/invite-moim?moimid=${moim.id}`)}>
+                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> nav(`/invite-moim?moimid=${moim.id}&category=${moim.category}`)}>
                                 <svg
                                     className="w-4 h-4"
                                     fill="none"

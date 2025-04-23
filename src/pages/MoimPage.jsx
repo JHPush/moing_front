@@ -42,6 +42,7 @@ const MoimPage = () => {
     }
 
     useEffect(() => {
+        console.log(user)
         if (moim.name === '') {
             getMoim(id, category).then(data => {
                 const temp = JSON.parse(data.body)

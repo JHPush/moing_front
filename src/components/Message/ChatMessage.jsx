@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { loadInitialMessages,loadOlderMessages, connectWebSocket } from "../../api/chatAPI";
+import { loadInitialMessages  } from "../../api/chatAPI";
+import { useWebSocket } from "../../contexts/WebSocketContext";
 
 const ChatMessage = () =>{
 
@@ -9,18 +10,13 @@ const ChatMessage = () =>{
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const memberId = queryParams.get('memberId');
+    const {socket} = useWebSocket();
+
     const [messages, setMessages] = useState([]);
-    const [socket, setSocket] = useState(null);
     const [messageInput, setMessageInput] = useState('');
-    const ws = useRef(null);
     const messagesEndRef = useRef(null);
-    // const messagesContainerRef = useRef(null);
 
     const user = useSelector(state => state.user.user)
-   
-    const nickname = user.nickname
-    const profile =user.profileImageUrl
-
 
     useEffect(()=>{
         // 기존 메시지 로드
@@ -36,35 +32,25 @@ const ChatMessage = () =>{
         };
 
         fetchMessages(); // 초기 메시지 가져오기
+      }, [gatheringId]);
 
-        ws.current = connectWebSocket(gatheringId);
+
+      useEffect(() => {
+        if (!socket) return;
     
-        ws.current.onopen = () => {
-            console.log('WebSocket connected')
-        }
-        ws.current.onmessage = (event) => {
-            const response = JSON.parse(event.data);
-            console.log('받은 데이터: ', response);
-
-            setMessages((prevMessages) => [...prevMessages, response]);
-        };
-            
-        ws.current.onerror = (error) => {
-            console.log('WebSocket Error:', error);
+        const handleMessage = (event) => {
+          const response = JSON.parse(event.data);
+          console.log("받은 데이터:", response);
+          setMessages((prev) => [...prev, response]);
         };
     
-        ws.current.onclose = () => {
-            console.log('WebSocket disconnected');
+        socket.addEventListener("message", handleMessage);
+    
+        return () => {
+          socket.removeEventListener("message", handleMessage);
         };
+      }, [socket]);
 
-        setSocket(ws.current);
-
-        return () =>{
-            if(ws.current){
-                ws.current.close();
-            }
-        }
-        },[gatheringId, memberId])
 
         // const handleLoadMore = async () => {
         //   const lastRegDate = messages[0].reg_date;
@@ -83,18 +69,17 @@ const ChatMessage = () =>{
         // };
 
         const sendMessage = () => {
-            if (messageInput.trim()) {
+            if (messageInput.trim() && socket && socket.readyState === WebSocket.OPEN) {
             const message = {
+                action: "chat",
                 gathering_id: gatheringId, 
                 member_id: user.userId,
                 message: messageInput,
             };
-            // WebSocket을 통해 메시지 전송
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify(message));
-                console.log('보낸 메시지:', message);
-            }
-            setMessageInput('');
+              // WebSocket을 통해 메시지 전송
+              socket.send(JSON.stringify(message));
+              console.log('보낸 메시지:', message);
+              setMessageInput('');
             }
         }
 

@@ -61,10 +61,10 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             alert('모두 작성해주세요');
             return;
         }
-        if(!showSchedule){
-            alert('일정을 등록해주세요')
-            return
-        }
+        // if(!showSchedule){
+        //     alert('일정을 등록해주세요')
+        //     return
+        // }
 
         postMoimPost(finalPost)
             .then(data => {

@@ -85,9 +85,10 @@ export const getInvitation = async (moimid)=>{
     return response.data.body;
 }
 
-export const postSendEmail = async (moimid, email)=>{
+export const postSendEmail = async (moimid, category, email)=>{
     const response = await axios.post(`${PREFIX_URL + MOING_API_URL}/invitation`, {
         moimid: moimid,
+        category: category,
         email: email,
       }, {
         headers: {

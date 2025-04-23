@@ -11,6 +11,7 @@ const InviteMoim = () => {
 
 
   const moimid = searchParams.get("moimid");
+  const category = searchParams.get("category");
 
 
   useEffect(() => {
@@ -35,8 +36,10 @@ const InviteMoim = () => {
   const handleEmailInput = async () => {
     console.log("email:", email);
     console.log("moimid:", moimid);
+    console.log("category:", category);
+
     try {
-      const response = await postSendEmail(moimid, email);
+      const response = await postSendEmail(moimid, category, email);
       console.log('response: ', response)
 
       if (response.data.statusCode === 200) {

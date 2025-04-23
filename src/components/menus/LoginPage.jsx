@@ -7,15 +7,18 @@ import { setUser } from '../../store/userSlice';
 import { saveUserToCookies } from '../../utils/cookieUtils'; // 쿠키 유틸스 추가
 import axios from 'axios'; // API 호출을 위한 axios
 import BasicLayout from '../../layouts/BasicLayout';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { connectOnLogin } = useWebSocket(); 
 
   const handleChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
+
 
   const handleLogin = async () => {
     const { email, password } = loginData;
@@ -28,7 +31,6 @@ const LoginPage = () => {
         const idToken = result.getIdToken().getJwtToken();
         const accessToken = result.getAccessToken().getJwtToken();
         const refreshToken = result.getRefreshToken().getToken();
-
         const payload = JSON.parse(atob(idToken.split('.')[1]));
         const userSub = payload.sub;
 
@@ -69,8 +71,12 @@ const LoginPage = () => {
           // Redux 상태에 저장
           dispatch(setUser(userInfo));
 
+          //  WebSocket 연결
+          connectOnLogin(userData.userId);
+
           alert('로그인 성공!');
-          navigate('/');
+          navigate('/');      
+
         } catch (error) {
           alert('사용자 정보를 가져오는 데 실패했습니다.');
           console.error(error);
