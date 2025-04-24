@@ -45,6 +45,9 @@ const SearchGroup = () => {
         e.preventDefault();
         navigate(`/search?keyword=${encodeURIComponent(keyword)}`)
     }
+      const handleClick = (gathering) => {
+        navigate(`/moim/moimid?moimid=${encodeURIComponent(gathering.id)}&category=${encodeURIComponent(gathering.category)}`);
+    };
     
 return(
   <>
@@ -69,7 +72,7 @@ return(
       <div className="gathering-list">
         {gatherings.length > 0 ? (
           gatherings.map((gathering) => (
-            <div key={gathering.id} className="gathering-box">
+            <div key={gathering.id} className="gathering-box" onClick={() => handleClick(gathering)} style={{ cursor: 'pointer' }}>
               <img
                 src={gathering.file_url}
                 alt={`${gathering.name} 대표 이미지`}

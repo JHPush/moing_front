@@ -3,20 +3,15 @@ import axios from "axios";
 import { getInvitation, postSendEmail } from "../../api/moimAPI";
 import {  useSearchParams } from "react-router-dom";
 
-const InviteMoim = ({moim_id}) => {
+const InviteMoim = ({moim_id, moim_category}) => {
   const [qrUrl, setQrUrl] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
   const [email, setEmail] = useState('');
-  // const[searchParams]= useSearchParams();
-
-
-  const moimid = moim_id;
-
 
   useEffect(() => {
     const fetchInviteData = async () => {
         try {
-        const data = await getInvitation(moimid);
+        const data = await getInvitation(moim_id);
         console.log("data:", data)
         setQrUrl(data.qr_url);
         setInviteUrl(data.invite_url);
@@ -33,10 +28,9 @@ const InviteMoim = ({moim_id}) => {
 
 
   const handleEmailInput = async () => {
-    console.log("email:", email);
-    console.log("moimid:", moimid);
+
     try {
-      const response = await postSendEmail(moimid, email);
+      const response = await postSendEmail(moim_id, moim_category, email);
       console.log('response: ', response)
 
       if (response.data.statusCode === 200) {

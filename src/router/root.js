@@ -13,6 +13,7 @@ const LoginPage = lazy(() => import("../components/menus/LoginPage"));
 const SignupPage = lazy(() => import("../components/menus/SignupPage"));
 const MoimPage = lazy(()=>import("../pages/MoimPage"))
 const InviteMoim = lazy(() => import("../components/moim/InviteMoim"));
+const Notification =lazy(() => import("../components/Notify/NotifyComponent"));
 
 const root = createBrowserRouter([
 
@@ -53,6 +54,10 @@ const root = createBrowserRouter([
   {
     path: "/invite-moim",
     element: <Suspense fallback={Loading}><InviteMoim/></Suspense>
+  },
+  {
+    path: "/notification",
+    element: <Suspense fallback={Loading}><Notification/></Suspense>
   }
 
 

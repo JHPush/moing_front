@@ -47,6 +47,7 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
                         <ProfileCard moim={moim} user={user} />
                         <div className="text-sm space-y-2 pl-2">
                             <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
+                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e=> nav(`/chat/${moim.id}`)}>채팅</button>
                             <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
                             <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> setActiveTab('inviteMember')}>
                                 <svg
@@ -77,7 +78,7 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
                         {activeTab === "photo" && <PhotoGallery files={files} />}
                         {/* {activeTab === "schedule" && <ScheduleComponent moim={moim} />} */}
                         {/* {activeTab === "member" && <MemberList moim={moim} />} */}
-                        {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id}/> }
+                        {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category}/> }
                         {activeTab === "postDetail" && selectedPost && (
                             <MoimPostView user = {user} post={selectedPost} updatePost={handlePostCreated} onBack={() => setActiveTab("home")} />
                         )}

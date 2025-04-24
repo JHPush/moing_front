@@ -4,20 +4,24 @@ import NoticeCard from "./component/moim/NoticeCard";
 import ActivityCard from "./component/moim/ActivityCard";
 import { useNavigate } from "react-router-dom";
 import {  putJoinMoim } from "../../api/moimAPI";
+import {updateUserInfo} from "../../utils/updateUserInfo"
+import { useDispatch } from "react-redux";
 
 
 
 const IntroductionMoim = ({moim, user}) => {
     const nav = useNavigate();
+    const dispatch = useDispatch()
 
     const handleOnClickJoinMoim = (e)=>{
+        console.log(user)
         if (user == null) {
             alert('로그인 정보 없음, 다시 로그인하세요')
             nav('/', { replace: true })
             return;
         }
         putJoinMoim(moim.id, moim.category, user.userId).then(data=>{
-            console.log(data)
+            // updateUserInfo(dispatch, user.userId)
             alert('모입 가입 성공!')
             // 추후 모임 메인페이지로 진입필요
             nav(`/introduct-moim/moimid?moimid=${moim.id}&category=${moim.category}`)

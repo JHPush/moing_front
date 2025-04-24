@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import MyGroupView from "./MyGroupView";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { getAllGroup } from "../../api/mainAPI";
-import { getPresignedURL_get } from "../../api/moimAPI";
 import '../../css/GroupBox.css' 
 import '../../css/SearchBox.css' 
 import UserLocation from "./UserLocation";
@@ -11,16 +10,14 @@ import UserLocation from "./UserLocation";
 const GroupView = () => {
     const [gatherings, setGatherings] = useState([]);
     const [category, setCategory] = useState('');
-    const [keyword, setKeyword] = useState('');
     const navigate = useNavigate();
+    const user = useSelector((state) => state.user.user);
 
     const getGroup = async () =>{
 
         const data = await getAllGroup(category);
         const groupList = JSON.parse(data);
-        // console.log("category: ", category)
         setGatherings(groupList);
-        // console.log("groupList:", groupList)
       
 
     }
@@ -29,30 +26,18 @@ const GroupView = () => {
         getGroup();
     }, [category]);
 
-    const handleSearch = (e) =>{
-        e.preventDefault();
-        navigate(`/search?keyword=${encodeURIComponent(keyword)}`)
-    }
+
+    const handleClick = (gathering) => {
+        navigate(`/moim/moimid?moimid=${encodeURIComponent(gathering.id)}&category=${encodeURIComponent(gathering.category)}`);
+    };
+
 
     return (
         <>
         <UserLocation/>
-        <form onSubmit={handleSearch} className="search-form">
-            <input
-                type="text"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="카테고리 또는 모임 이름 입력"
-                className="search-input"
-            />
-            <button
-                type="submit"
-                className="search-button"
-            >
-                검색
-            </button>
-        </form>
-        <MyGroupView />
+
+        {/* 로그인한 경우에만 MyGroupView 표시 */}
+        {user && <MyGroupView />}
 
         <div className="board-view">
             <h1 className="text-center">모든 모임 목록</h1>
@@ -78,11 +63,12 @@ const GroupView = () => {
             </div>
             <div className="gathering-list">
                 {gatherings.map((gathering) => (
-                    <div key={gathering.id} className="gathering-box">
+                    <div key={gathering.id} className="gathering-box" onClick={() => handleClick(gathering)} style={{ cursor: 'pointer' }}>
                         <img
                             src={gathering.file_url}
                             alt={`${gathering.name} 대표 이미지`}
                             className="gathering-image"
+                            
                         />
                         <h5>{gathering.name}</h5>
                         <p>카테고리: {gathering.category}</p>

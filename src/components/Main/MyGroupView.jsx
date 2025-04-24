@@ -1,25 +1,34 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { getMyGroup } from "../../api/mainAPI";
 import '../../css/GroupBox.css' 
+import { useNavigate } from "react-router-dom";
 
 const MyGroupView = ()=>{
 
     const [gatherings, setGatherings] = useState([]);
-   
+    const navigate = useNavigate();
     const user = useSelector((state) => state.user.user)
-    // console.log('user:', user)
-    const getMyGroup = async () =>{
-        const res = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing/groups/mine`);
-
-
-        setGatherings(JSON.parse(res.data.body));
-
-    }
 
     useEffect(() => {
-        getMyGroup();
-    }, []);
+        const fetchData = async () =>{
+
+            if(!user) return;
+            try{
+                const res = await getMyGroup(user.userId)
+                setGatherings(JSON.parse(res.data.body));
+            } catch (error) {
+                console.error("error: ", error);
+                
+            }
+        }
+            fetchData();
+        
+    }, [user]);
+
+    const handleClick = (gathering) => {
+        navigate(`/moim/moimid?moimid=${encodeURIComponent(gathering.id)}&category=${encodeURIComponent(gathering.category)}`);
+    };
 
     
     return(
@@ -28,7 +37,7 @@ const MyGroupView = ()=>{
             <div className="group-list">
                 {gatherings.length > 0 ? (
                     gatherings.map((gathering) => (
-                        <div key={gathering.id} className="gathering-box">
+                        <div key={gathering.id} className="gathering-box" onClick={() => handleClick(gathering)} style={{ cursor: 'pointer' }}>
                             <img
                                 src={gathering.file_url}
                                 alt={`${gathering.name} 이미지`}

@@ -34,7 +34,7 @@ const UserLocation = () =>{
 
                 // 응답 결과에서 동 정보 추출
                 const address = response.data.documents[0].address;
-                console.log("address", address)
+                // console.log("address", address)
                 const fullAddress = address.region_3depth_name; // "동" 정보가 여기에 있습니다.
                 setUserDong(fullAddress); // 동 정보 저장
               

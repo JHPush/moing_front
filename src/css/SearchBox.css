@@ -23,7 +23,7 @@
   }
 
   /* 검색 폼 */
-.search-form {
+/* .search-form {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -35,7 +35,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-}
+} */
 
 .search-button {
   padding: 6px 12px;

@@ -5,16 +5,20 @@ import { userPool } from '../../aws-config';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { getUserData } from '../../api/userAPI';  // 사용자 정보 가져오기 API 호출
-import { updateUserInfo } from '../../utils/updateUserInfo';  // 상태 업데이트 함수
+import { useWebSocket } from '../../contexts/WebSocketContext';
+import { saveUserToCookies } from '../../utils/cookieUtils';
+import { setUser } from '../../store/userSlice';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { connectOnLogin } = useWebSocket(); 
 
   const handleChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
+
 
   const handleLogin = async () => {
     const { email, password } = loginData;
@@ -27,7 +31,6 @@ const LoginPage = () => {
         const idToken = result.getIdToken().getJwtToken();
         const accessToken = result.getAccessToken().getJwtToken();
         const refreshToken = result.getRefreshToken().getToken();
-
         const payload = JSON.parse(atob(idToken.split('.')[1]));
         const userSub = payload.sub;
 
@@ -53,11 +56,15 @@ const LoginPage = () => {
             accessToken: accessToken,
           };
 
-          // 상태와 쿠키를 업데이트하는 함수 호출
-          updateUserInfo(dispatch, userInfo);
+          dispatch(setUser(userInfo));
+          saveUserToCookies(userInfo);
+
+          //  WebSocket 연결
+          connectOnLogin(userData.userId);
 
           alert('로그인 성공!');
-          navigate('/');
+          navigate('/');      
+
         } catch (error) {
           alert('사용자 정보를 가져오는 데 실패했습니다.');
           console.error(error);

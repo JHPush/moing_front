@@ -6,8 +6,7 @@ export const getAllGroup = async (category)=>{
     const res = await axios.get(`${PREFIX_URL}/groups`, { params: { category } });
     return res.data.body;
 }
-export const getMyGroup = async ()=>{
-    const res = await axios.get(`${PREFIX_URL}/groups/mine`);
-    console.log("res:", res)
+export const getMyGroup = async (userId)=>{
+    const res = await axios.get(`${PREFIX_URL}/groups/mine`,{params: {userId}});
     return res;
 }
