@@ -13,7 +13,7 @@ const MoimPostCard = ({ post, onSelectPost }) => {
                 <h3 className="text-lg font-semibold text-gray-800 truncate">
                     {post.title}
                 </h3>
-                {post.files.length>0?<div className="flex items-center space-x-1 text-gray-500 text-sm flex-shrink-0 ml-2">
+                {post.files && post.files.length>0?<div className="flex items-center space-x-1 text-gray-500 text-sm flex-shrink-0 ml-2">
                     <span>📷</span>
                 </div>:<></>}
                 

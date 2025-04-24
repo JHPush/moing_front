@@ -26,25 +26,16 @@ const MoimPage = () => {
     const [moim, setMoim] = useState({ ...initMoimForm });
     const [posts, setPosts] = useState([]);
     const [reloadTrigger, setReloadTrigger] = useState(false);
-    const [files, setFiles] = useState({ allPresignedImg: [] });
 
-    const updateFiles = (newPresignedImg) => {
-        setFiles(prevFiles => ({
-            ...prevFiles,
-            allPresignedImg: [...prevFiles.allPresignedImg, ...newPresignedImg]
-        }));
-    };
+
 
     const getMoimPosts = async (id) => {
         try {
             const postRes = JSON.parse(await getAllPostByMoimId(id));
             const postImgRes = JSON.parse(await getAllPostImages(id, 'moim-post-images'));
-            let allPresignedImg = [];
 
             const newPosts = postRes.map(post => {
                 const matchingImages = postImgRes.filter(img => img.post_id === post.id);
-                const urls = matchingImages.flatMap(obj => obj.files.map(temp => temp.presigned_url));
-                allPresignedImg.push(...urls);
 
                 return {
                     ...post,
@@ -52,7 +43,6 @@ const MoimPage = () => {
                 };
             });
             setPosts(newPosts);
-            updateFiles(allPresignedImg);
         } catch (error) {
             console.error("오류 발생:", error);
         }
@@ -81,8 +71,8 @@ const MoimPage = () => {
 
     return (
         <BasicLayout>
-            {user && user.gatherings && user.gatherings.includes(moim.id) ? (
-                <MoimMainLayout moim={moim} user={user} posts={posts} files={files} handlePostCreated={handlePostCreated} />
+            {user && user.gatherings.includes(moim.id) ? (
+                <MoimMainLayout moim={moim} user={user} posts={posts}  handlePostCreated={handlePostCreated} />
             ) : (
                 <IntroductionMoim moim={moim} user={user} />
             )}

@@ -6,9 +6,10 @@ import MoimPostView from "./component/post/MoimPostViewCard";
 import { useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
 import PhotoGallery from "./component/PhotoGallery";
+import MoimPostCalanderComponent from "./component/post/MoimPostCalanderComponent";
 
 
-const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
+const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
     const [isOpenPost, setIsOpenPost] = useState(false)
     const [activeTab, setActiveTab] = useState("home");
     const [selectedPost, setSelectedPost] = useState(null); // 게시글 상세 보기용
@@ -18,38 +19,41 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
         <div className="bg-gray-50 min-h-screen py-6 px-4 flex justify-center font-[Pretendard]">
             <div className="w-full max-w-6xl">
                 {/* Navigation */}
-                    <nav className="flex justify-center space-x-6 text-sm font-medium text-gray-600 border-b pb-3 mb-6">
-                        <span
-                            className={`${activeTab === "home" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                            onClick={() => setActiveTab("home")} >
-                            홈
-                        </span>
-                        <span
-                            className={`${activeTab === "photo" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                            onClick={() => setActiveTab("photo")} >
-                            사진첩
-                        </span>
-                        <span
-                            className={`${activeTab === "schedule" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                            onClick={() => setActiveTab("schedule")}>
-                            일정
-                        </span>
-                        <span
-                            className={`${activeTab === "member" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                            onClick={() => setActiveTab("member")}>
-                            멤버
-                        </span>
-                    </nav>
+                <nav className="flex justify-center space-x-6 text-sm font-medium text-gray-600 border-b pb-3 mb-6">
+                    <span
+                        className={`${activeTab === "home" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
+                        onClick={() => setActiveTab("home")} >
+                        홈
+                    </span>
+                    <span
+                        className={`${activeTab === "photo" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
+                        onClick={() => setActiveTab("photo")} >
+                        사진첩
+                    </span>
+                    <span
+                        className={`${activeTab === "schedule" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
+                        onClick={() => setActiveTab("schedule")}>
+                        일정
+                    </span>
+                    <span
+                        className={`${activeTab === "member" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
+                        onClick={() => setActiveTab("member")}>
+                        멤버
+                    </span>
+                </nav>
 
                 <div className="grid grid-cols-4 gap-4">
                     {/* Sidebar */}
                     <aside className="col-span-1 space-y-4">
                         <ProfileCard moim={moim} user={user} />
                         <div className="text-sm space-y-2 pl-2">
-                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
-                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e=> nav(`/chat/${moim.id}`)}>채팅</button>
+                            {activeTab === 'home' ?
+                                <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
+                                : <></>}
+
+                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e => nav(`/chat/${moim.id}`)}>채팅</button>
                             <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
-                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> setActiveTab('inviteMember')}>
+                            <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e => setActiveTab('inviteMember')}>
                                 <svg
                                     className="w-4 h-4"
                                     fill="none"
@@ -75,15 +79,15 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
                                 setActiveTab("postDetail");
                             }} />
                         )}
-                        {activeTab === "photo" && <PhotoGallery files={files} />}
-                        {/* {activeTab === "schedule" && <ScheduleComponent moim={moim} />} */}
+                        {activeTab === "photo" && <PhotoGallery posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
+                        {activeTab === "schedule" && <MoimPostCalanderComponent moim={moim} posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {/* {activeTab === "member" && <MemberList moim={moim} />} */}
-                        {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category}/> }
+                        {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
-                            <MoimPostView user = {user} post={selectedPost} updatePost={handlePostCreated} onBack={() => setActiveTab("home")} />
+                            <MoimPostView user={user} post={selectedPost} updatePost={handlePostCreated} onBack={() => setActiveTab("home")} />
                         )}
                     </div>
-                    <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post)=>{setSelectedPost(post); setActiveTab("postDetail");}} />
+                    <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />
 
                 </div>
             </div>
