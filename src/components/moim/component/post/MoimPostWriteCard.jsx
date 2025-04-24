@@ -90,8 +90,9 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             return;
         }
 
-        if (imageFiles.length > 0) {
-            try {
+        try {
+            if (imageFiles.length > 0) {
+
                 setImageUrls([])
                 const requestData = imageFiles.map(file => ({
                     filename: file.name,
@@ -104,23 +105,24 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
                 const uploadPromises = data.map(async (file, idx) => {
                     await putUploadMoimImageByPresignedUrl(file.uploadUrl, imageFiles[idx]);
                     return file.fileUrl;
-                  });
-                  
+                });
+
 
                 const uploadUrls = await Promise.all(uploadPromises)
                 console.log('uploadUrls : ', uploadUrls)
                 finalPost.files = uploadUrls;
+            }
 
-                const finalRes = await postMoimPost(JSON.stringify(finalPost));
-                console.log('게시글 등록 결과 : ', finalRes)
-                alert('게시글 등록 완료')
-                onPostCreated()
-            }
-            catch(error){
-                console.error('Error Upload or Post', error)
-                alert('에러 발생')
-            }
+            const finalRes = await postMoimPost(JSON.stringify(finalPost));
+            console.log('게시글 등록 결과 : ', finalRes)
+            alert('게시글 등록 완료')
+            onPostCreated()
         }
+        catch (error) {
+            console.error('Error Upload or Post', error)
+            alert('에러 발생')
+        }
+
     }
 
     return (
