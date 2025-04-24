@@ -3,7 +3,7 @@ import { getNotify, changeIsRead } from "../../api/notifyAPI";
 import { useSelector } from "react-redux";
 
 const NotifyComponent = ({socket}) => {
-  console.log("socket:", socket)
+
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const user = useSelector((state) => state.user.user)
@@ -88,10 +88,10 @@ const NotifyComponent = ({socket}) => {
     };
     
     //안읽은 메세지 숫자 표시
-    const unreadCount = notifications.filter((n) => {
-      const msg = n.message || n;
-      return !msg.is_read;
-    }).length;
+    // const unreadCount = notifications.filter((n) => {
+    //   const msg = n.message || n;
+    //   return !msg.is_read;
+    // }).length;
     
 
   return (

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 // WebSocket 연결 상태를 관리할 context
 const WebSocketContext = createContext();
@@ -10,7 +10,7 @@ export const WebSocketProvider = ({ children }) => {
   // WebSocket 연결 함수
   const connectWebSocket = (url) => {
     const socket = new WebSocket(url);
-    // console.log("type:", type)
+    
     socket.onopen = () => {
       console.log(`WebSocket 연결 성공`);
     };
