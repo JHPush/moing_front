@@ -5,9 +5,10 @@ import ProfileCard from "./component/moim/ProfileCard";
 import MoimPostView from "./component/post/MoimPostViewCard";
 import { useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
+import PhotoGallery from "./component/PhotoGallery";
 
 
-const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
+const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
     const [isOpenPost, setIsOpenPost] = useState(false)
     const [activeTab, setActiveTab] = useState("home");
     const [selectedPost, setSelectedPost] = useState(null); // 게시글 상세 보기용
@@ -73,7 +74,7 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                                 setActiveTab("postDetail");
                             }} />
                         )}
-                        {/* {activeTab === "photo" && <PhotoGallery moim={moim} />} */}
+                        {activeTab === "photo" && <PhotoGallery files={files} />}
                         {/* {activeTab === "schedule" && <ScheduleComponent moim={moim} />} */}
                         {/* {activeTab === "member" && <MemberList moim={moim} />} */}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id}/> }
