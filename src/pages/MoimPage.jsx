@@ -81,7 +81,7 @@ const MoimPage = () => {
 
     return (
         <BasicLayout>
-            {user && user.gatherings.includes(moim.id) ? (
+            {user && user.gatherings && user.gatherings.includes(moim.id) ? (
                 <MoimMainLayout moim={moim} user={user} posts={posts} files={files} handlePostCreated={handlePostCreated} />
             ) : (
                 <IntroductionMoim moim={moim} user={user} />
