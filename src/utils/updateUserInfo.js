@@ -1,16 +1,16 @@
 // src/utils/updateUserInfo.js
 import { setUser } from '../store/userSlice';
 import { saveUserToCookies } from './cookieUtils';
-import { getUserData, getUserById } from '../api/userAPI';
+import { getUserData } from '../api/userAPI';
 
 
 // 상태 갱신 및 쿠키 업데이트 함수
-export const updateUserInfo = async(dispatch, userId) => {
+export const updateUserInfo = async(dispatch, userId, idToken, accessToken) => {
 
-  console.log('user id --- ',userId)
-  const userData = await getUserById(userId); // 사용자 정보 API 호출
-  console.log('user -- ',userData)
-  // 사용자 정보 저장 (쿠키 및 Redux 상태)
+  const userData = await getUserData(userId, idToken); // 사용자 정보 API 호출
+
+  console.log("userData : ", userData);
+
   const userInfo = {
     userId: userData.userId,
     email: userData.email,
@@ -23,10 +23,11 @@ export const updateUserInfo = async(dispatch, userId) => {
     gender: userData.gender,
     role: userData.role,
     phoneNumber: userData.phoneNumber,
-    isWithdraw: userData.isWithdraw
+    isWithdraw: userData.isWithdraw,
+    idToken: idToken,
+    accessToken: accessToken,
   };
 
   dispatch(setUser(userInfo)); // 리덕스 상태 갱신
   saveUserToCookies(userInfo);  // 쿠키 갱신
 };
-

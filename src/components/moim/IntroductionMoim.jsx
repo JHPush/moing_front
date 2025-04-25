@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { putJoinMoim } from "../../api/moimAPI";
 import { updateUserInfo } from "../../utils/updateUserInfo"
 import { useDispatch } from "react-redux";
-
+import { postApplyMoim } from "../../api/moimAPI";
 
 
 const IntroductionMoim = ({ moim, user }) => {
@@ -20,19 +20,16 @@ const IntroductionMoim = ({ moim, user }) => {
             nav('/', { replace: true })
             return;
         }
-        putJoinMoim(moim.id, moim.category, user.userId).then(data => {
-            // updateUserInfo(dispatch, user.userId).then(dta => {
-
-            alert('모입 가입 성공!')
-            // 추후 모임 메인페이지로 진입필요
-            nav(`/introduct-moim/moimid?moimid=${moim.id}&category=${moim.category}`)
-            // }).catch(e => {
-            //     console.error('errro : ', e)
-            // })
-            // nav('/', {replace:true})
-        }).catch(e => {
-            console.log('error : ', e)
-        })
+        postApplyMoim(user.userId, moim.id)
+            .then(() => {
+                alert('모임 가입 신청이 완료되었습니다!');
+                nav(`/introduct-moim/moimid?moimid=${moim.id}&category=${moim.category}`);
+                // 뒤로 이동하거나, 신청 완료 상태로 버튼 비활성화할 수도 있음
+            })
+            .catch(err => {
+                console.error('가입 신청 실패:', err);
+                alert('이미 신청했거나 오류가 발생했습니다.');
+            });
     }
 
     return (

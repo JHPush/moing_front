@@ -14,12 +14,12 @@ const BasicMenu = () => {
   const { socket } = useWebSocket(); // WebSocketContext에서 받아오기
 
   const checkLogin = (e)=>{
-    console.log(e.target.name)
+    console.log(e)
     if(user) {
       nav(e.target.name)
       return;
     }
-    alert('로그인을 진행해주세요요')
+    alert('로그인을 진행해주세요')
     nav('', {replace:true})
   }
 

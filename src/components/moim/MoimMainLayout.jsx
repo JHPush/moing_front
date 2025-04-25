@@ -6,7 +6,7 @@ import MoimPostView from "./component/post/MoimPostViewCard";
 import { useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
 import PhotoGallery from "./component/PhotoGallery";
-
+import MemberList from "./component/moim/MemberList"
 
 const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
     const [isOpenPost, setIsOpenPost] = useState(false)
@@ -77,7 +77,7 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
                         )}
                         {activeTab === "photo" && <PhotoGallery files={files} />}
                         {/* {activeTab === "schedule" && <ScheduleComponent moim={moim} />} */}
-                        {/* {activeTab === "member" && <MemberList moim={moim} />} */}
+                        {activeTab === "member" && <MemberList moim={moim} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category}/> }
                         {activeTab === "postDetail" && selectedPost && (
                             <MoimPostView user = {user} post={selectedPost} updatePost={handlePostCreated} onBack={() => setActiveTab("home")} />
