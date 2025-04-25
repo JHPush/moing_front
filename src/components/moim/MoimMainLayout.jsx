@@ -10,6 +10,7 @@ import MoimPostCalanderComponent from "./component/post/MoimPostCalanderComponen
 import { getAllPostImages, postPagePostByMoimId, putExitMoim } from "../../api/moimAPI";
 import ChatMessageBox from "../Message/ChatMessageBox";
 
+import MemberList from "./component/moim/MemberList"
 
 
 
@@ -27,8 +28,6 @@ const MoimMainLayout = ({ moim, user }) => {
     const [showChatPopup, setShowChatPopup] = useState(false);
 
     const id = searchParams.get('moimid');
-
-    const nav = useNavigate()
 
     const getMoimPosts = async (id, limit = 5, key = null) => {
         if (!id) return;
@@ -180,7 +179,7 @@ const MoimMainLayout = ({ moim, user }) => {
                         )}
                         {activeTab === "photo" && <PhotoGallery posts={posts} photos={postImgRes} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {activeTab === "schedule" && <MoimPostCalanderComponent moim={moim} posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
-                        {/* {activeTab === "member" && <MemberList moim={moim} />} */}
+                        {activeTab === "member" && <MemberList moim={moim} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
                             <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} onBack={() => setActiveTab("home")} />

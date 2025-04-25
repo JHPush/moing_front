@@ -33,7 +33,7 @@ export const getScheduledPostByMoim = async (moim_id)=>{
 }
 
 
-export const getPresignedURL_PostPut = async (urls) =>{
+export const getPresignedURL_PostPut = async (urls) => {
     return (await axios.post(`${PREFIX_URL + MOING_POST_PRESIGN_URL_POST}`, urls, {
         headers: {
             'Content-Type': 'application/json'
@@ -46,12 +46,12 @@ export const putExitMoim = async (moimid, moimcategory, userid)=>{
             { headers: { 'Content-Type': 'application/json' } })).data;
 }
 
-export const getAllPostImages = async (moim_id, bucketName)=>{
-    return (await axios.get(`${PREFIX_URL +MOING_API_URL+ MOING_GET_IMAGES_URI}`, {params: {'moim_id' : moim_id, 'bucket':bucketName}})).data.body
+export const getAllPostImages = async (moim_id, bucketName) => {
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_GET_IMAGES_URI}`, { params: { 'moim_id': moim_id, 'bucket': bucketName } })).data.body
 }
 
-export const getAllPostByMoimId = async(moim_id)=>{
-    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, {params: {'moim_id' : moim_id}})).data.body
+export const getAllPostByMoimId = async (moim_id) => {
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, { params: { 'moim_id': moim_id } })).data.body
 }
 export const postPagePostByMoimId = async (moim_id, limit, key = null) => {
     const body = {
@@ -65,7 +65,7 @@ export const postPagePostByMoimId = async (moim_id, limit, key = null) => {
 
 
 export const getPresignedURL_get = async (fileurl, bucketName) => {
-    return (await axios.get(`${PREFIX_URL + MOING_PRESIGN_URL_GET}`, { params: { 'fileurl': fileurl, 'bucket':bucketName } })).data;
+    return (await axios.get(`${PREFIX_URL + MOING_PRESIGN_URL_GET}`, { params: { 'fileurl': fileurl, 'bucket': bucketName } })).data;
 }
 
 export const getMoimImageByPresignedUrl = async (url) => {
@@ -76,16 +76,16 @@ export const getMoim = async (id, category) => {
     return (await axios.get(`${PREFIX_URL + MOING_API_URL}`, { params: { 'id': id, 'category': category } })).data;
 }
 export const putJoinMoim = async (moimId, moimCategory, userId) => {
-    return ( await axios.put( `${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}`,
-                                { moimid: moimId, moimcategory: moimCategory, userid: userId },
-                                { headers: { 'Content-Type': 'application/json' } })).data;
+    return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}`,
+        { moimid: moimId, moimcategory: moimCategory, userid: userId },
+        { headers: { 'Content-Type': 'application/json' } })).data;
 };
 
 
 export const putUploadMoimImageByPresignedUrl = async (url, file) => {
     return (await axios.put(`${url}`, file, {
         headers: {
-            'Content-Type': file.type || 'application/octet-stream', 
+            'Content-Type': file.type || 'application/octet-stream',
         },
     }));
 }
@@ -96,24 +96,24 @@ export const postCreateMoing = async (form) => {
 }
 
 
-export const postMoimPost = async(form)=>{
+export const postMoimPost = async (form) => {
     console.log('form : ', form)
-    const headers = {'Content-Type': 'application/json'}
-    return (await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form ,{headers})).data
+    const headers = { 'Content-Type': 'application/json' }
+    return (await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form, { headers })).data
 }
 
-export const deleteMoimPost = async(form)=>{
+export const deleteMoimPost = async (form) => {
     console.log('api del : ', form)
-    const headers = {'Content-Type': 'application/json'}
-    return (await axios.delete(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, {data:form, headers})).data
+    const headers = { 'Content-Type': 'application/json' }
+    return (await axios.delete(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, { data: form, headers })).data
 }
 
 
-export const updateMoimPost = async(form)=>{
+export const updateMoimPost = async (form) => {
     console.log('api upd : ', form)
 
-    const headers = {'Content-Type': 'application/json'}
-    return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form, {headers})).data
+    const headers = { 'Content-Type': 'application/json' }
+    return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form, { headers })).data
 }
 
 export const getInvitation = async (moimid, category)=>{
@@ -132,19 +132,19 @@ export const postSendEmail = async (moimid, category, email, nickname)=>{
         nickname: nickname
       }, {
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         }
-      });
-      console.log('response:', response)
-      
-      return response;
+    });
+    console.log('response:', response)
+
+    return response;
 }
 
-export const getUserLocation = ()=>{
+export const getUserLocation = () => {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(resolve, reject);
-      
+
         } else {
             reject(new Error("Geolocation is not supported by this browser."));
         }
@@ -160,7 +160,44 @@ export const searchLocationApi = async (keyword) => {
         },
         headers: {
             Authorization: `KakaoAK ${process.env.REACT_APP_KAKAO_API_KEY}`, // 환경변수로 API 키 설정
-        }}
+        }
+    }
     )
     return res.data.documents
 }
+
+export const getMoimMembers = async (moimId) => {
+    const res = await axios.get(`${PREFIX_URL + MOING_API_URL}/${moimId}/members`);
+    console.log("res : ", res);
+    return res.data;
+};
+
+export const getPendingMembers = async (moimId) => {
+    const res = await axios.get(`${PREFIX_URL + MOING_API_URL}/${moimId}/pending-members`);
+    console.log("res.data.pendingMembers : ", res.data.pendingMembers);
+    return res.data;
+  };
+
+export const postApplyMoim = async (userId, moimId) => {
+    return await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}/apply`, {
+        userId,
+        moimId,
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+};
+
+export const approveMember = async (userId, moimId, category) => {
+    return await axios.put(`${PREFIX_URL + MOING_API_URL}/approve-member`, {
+      userId,
+      moimId,
+      category
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  };
+  

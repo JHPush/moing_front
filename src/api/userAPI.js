@@ -24,6 +24,7 @@ export const getUserData = async (userSub, idToken) => {
 export const getUserById = async (userId) => {
     try {
       const response = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/users/${userId}`);
+      console.log("response : ". response);
       return response.data; // 사용자 정보 반환
     } catch (error) {
       console.error("Failed to fetch user info", error);

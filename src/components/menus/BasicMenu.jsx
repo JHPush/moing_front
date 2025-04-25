@@ -14,7 +14,7 @@ const BasicMenu = () => {
   const { socket, disconnectWebSocket } = useWebSocket(); // WebSocketContext에서 받아오기
 
   const checkLogin = (e)=>{
-    console.log(e.target.name)
+    console.log(e)
     if(user) {
       nav(e.target.name)
       return;
