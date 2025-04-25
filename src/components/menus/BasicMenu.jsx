@@ -11,7 +11,7 @@ const BasicMenu = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
 
-  const { socket } = useWebSocket(); // WebSocketContext에서 받아오기
+  const { socket, disconnectWebSocket } = useWebSocket(); // WebSocketContext에서 받아오기
 
   const checkLogin = (e)=>{
     console.log(e.target.name)
@@ -19,11 +19,12 @@ const BasicMenu = () => {
       nav(e.target.name)
       return;
     }
-    alert('로그인을 진행해주세요요')
+    alert('로그인을 진행해주세요')
     nav('', {replace:true})
   }
 
   const handleLogout = () => {
+    disconnectWebSocket();
     removeUserFromCookies();
     removeCookie('idToken');
     removeCookie('accessToken');
@@ -65,9 +66,11 @@ const BasicMenu = () => {
           <button name="/moim/moimid?moimid=moing.us-파일생성%20테스트&category=영화" onClick={checkLogin}>임시 모임 조회</button> 
           </li>
           {/* 알림 컴포넌트 */}
+          {isAuthenticated && (
           <li className="relative pr-6 text-2xl">
         <NotifyComponent socket={socket}  />
         </li>
+          )}
         </ul>
       </div>
     </nav>

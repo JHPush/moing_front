@@ -7,7 +7,6 @@ import moimRouter from "./moingRouter";
 const Loading = <div>Loading....</div>
 const Main = lazy(() => import("../pages/MainPage"))
 const ChatMessage = lazy(() => import ("../components/Message/ChatMessage"))
-const SearchGroup = lazy(() => import ("../components/Main/SearchGroup"))
 const CreateMoimPage = lazy(()=>import("../pages/CreateMoimPage"))
 const LoginPage = lazy(() => import("../components/menus/LoginPage"));
 const SignupPage = lazy(() => import("../components/menus/SignupPage"));
@@ -36,10 +35,6 @@ const root = createBrowserRouter([
   {
     path: "chat/:gatheringId",
     element: <Suspense fallback={Loading}><ChatMessage/></Suspense>
-  },
-  {
-    path: "/search",
-    element: <Suspense fallback={Loading}><SearchGroup/></Suspense>
   },
   {
 

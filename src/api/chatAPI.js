@@ -1,11 +1,11 @@
 import axios from "axios"
 
-const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing'
+const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/'
 
 
 //처음메세지 로드 (limit =8)
 export const loadInitialMessages = async (gatheringId)=>{
-    const res = await axios.get(`${PREFIX_URL}/chats/${gatheringId}`);
+    const res = await axios.get(`${PREFIX_URL}/moing/chats/${gatheringId}`);
     console.log("res:", res)
     return res;
 }

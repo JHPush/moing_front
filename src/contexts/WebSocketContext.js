@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useRef } from 'react';
 
 // WebSocket 연결 상태를 관리할 context
 const WebSocketContext = createContext();
@@ -6,31 +6,53 @@ const WebSocketContext = createContext();
 // WebSocket 제공자 컴포넌트
 export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const reconnectInterval = useRef(null);
+  const pingInterval = useRef(null);
+  
+  const connectWebSocket = (userId) => {
+    const url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${userId}`;
+    const ws = new WebSocket(url);
 
-  // WebSocket 연결 함수
-  const connectWebSocket = (url) => {
-    const socket = new WebSocket(url);
-    
-    socket.onopen = () => {
-      console.log(`WebSocket 연결 성공`);
+    ws.onopen = () => {
+      console.log('✅ WebSocket 연결 성공');
+      setSocket(ws);
+
+      // 주기적인 ping 메시지
+      pingInterval.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          console.log('📡 WebSocket-Ping 메시지 전송 중...');
+          ws.send(JSON.stringify({ type: 'ping' }));
+        }
+      }, 5 * 60 * 1000); // 5분마다
     };
 
-    socket.onclose = () => {
-      console.log(`WebSocket 연결 종료`);
+    ws.onclose = () => {
+      console.log('❌ WebSocket 연결 종료');
+      clearInterval(pingInterval.current);
+      setSocket(null);
+
+      // 자동 재연결 시도
+      // if (userId) {
+      //   console.log(userId)
+      //   console.log("재연결 시도중")
+      //   reconnectInterval.current = setTimeout(() => {
+      //     console.log('🔄 WebSocket 재연결 시도');
+      //     connectWebSocket(userId);
+      //   }, 3000); // 3초 후 재연결
+      // }
     };
 
-    socket.onerror = (error) => {
+    ws.onerror = (error) => {
       console.error(`WebSocket 에러:`, error);
     };
 
-    return socket;
+    return ws;
   };
 
   const connectOnLogin = (userId) => {
-    const Url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${userId}`;
-    const socket = connectWebSocket(Url);
-  
-    setSocket(socket);
+    setUserId(userId);
+    connectWebSocket(userId);
 
   };
   
@@ -41,7 +63,11 @@ export const WebSocketProvider = ({ children }) => {
     if (socket) {
       socket.close();
       setSocket(null);
+      setUserId(null)
     }
+    clearInterval(pingInterval.current);
+    clearTimeout(reconnectInterval.current);
+    console.log('🛑로그아웃- WebSocket 연결 수동 종료 ');
   };
 
   return (

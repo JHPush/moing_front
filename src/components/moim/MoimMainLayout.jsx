@@ -7,7 +7,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
 import PhotoGallery from "./component/PhotoGallery";
 import MoimPostCalanderComponent from "./component/post/MoimPostCalanderComponent";
-import { getAllPostImages, getPagePostByMoimId, postPagePostByMoimId, putExitMoim } from "../../api/moimAPI";
+import { getAllPostImages, postPagePostByMoimId, putExitMoim } from "../../api/moimAPI";
+import ChatMessageBox from "../Message/ChatMessageBox";
+
+
+
 
 
 const MoimMainLayout = ({ moim, user }) => {
@@ -20,6 +24,7 @@ const MoimMainLayout = ({ moim, user }) => {
     const [reloadTrigger, setReloadTrigger] = useState(false);
     const [pageKey, setPageKey] = useState(null)
     const [postImgRes, setPostImgRes] = useState([])
+    const [showChatPopup, setShowChatPopup] = useState(false);
 
     const id = searchParams.get('moimid');
 
@@ -34,7 +39,7 @@ const MoimMainLayout = ({ moim, user }) => {
                 postPagePostByMoimId(id, limit, key),
                 postImgRes.length === 0
                     ? getAllPostImages(id, 'moim-post-images')
-                    : Promise.resolve(JSON.stringify(postImgRes)) 
+                    : Promise.resolve(JSON.stringify(postImgRes))
             ]);
             const postRes = JSON.parse(postResRaw);
             setPageKey(postRes.last_evaluated_key)
@@ -42,7 +47,7 @@ const MoimMainLayout = ({ moim, user }) => {
             const images = postImgRes.length === 0 ? JSON.parse(imageResRaw) : postImgRes;
 
             setPostImgRes(images);
-            
+
 
             // 게시글에 이미지 매핑
             const newPosts = postRes.posts.map(post => {
@@ -52,7 +57,7 @@ const MoimMainLayout = ({ moim, user }) => {
                     files: matched.length > 0 ? matched[0].files : []
                 };
             });
-            
+
             setPosts(prevPosts => {
                 // 중복된 게시글 처리
                 const uniqueNewPosts = newPosts.filter(newPost =>
@@ -76,16 +81,28 @@ const MoimMainLayout = ({ moim, user }) => {
         getMoimPosts(id, 5, pageKey);
     }, [id, reloadTrigger]);
 
-    const handleOnExitMoim=()=>{
-        if(!window.confirm('정말 탈퇴하시겠습니까?'))
+    const handleOnExitMoim = () => {
+        if (!window.confirm('정말 탈퇴하시겠습니까?'))
             return
-        putExitMoim(moim.id, moim.category, user.userId).then(d=>{
+        putExitMoim(moim.id, moim.category, user.userId).then(d => {
             console.log(d)
             alert('모임을 탈퇴했습니다')
-        }).catch(e=>{
+        }).catch(e => {
             console.log('error', e)
         })
     }
+
+    useEffect(() => {
+        if (location.state?.activeTab === "postDetail" && location.state?.postId) {
+            const targetPost = posts.find(p => String(p.id) === String(location.state.postId));
+
+            if (targetPost) {
+                setSelectedPost(targetPost);
+                setActiveTab("postDetail");
+            }
+        }
+    }, [location.state, posts]);
+
 
 
     return (
@@ -124,7 +141,15 @@ const MoimMainLayout = ({ moim, user }) => {
                                 <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
                                 : <></>}
 
-                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e => nav(`/chat/${moim.id}`)}>채팅</button>
+
+
+                            <button
+                                className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md"
+                                onClick={() => setShowChatPopup(true)}
+                            >
+                                채팅
+                            </button>
+
                             <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e => setActiveTab('inviteMember')}>
                                 <svg
                                     className="w-4 h-4"
@@ -165,7 +190,16 @@ const MoimMainLayout = ({ moim, user }) => {
 
                 </div>
             </div>
+            {/* 채팅 팝업 */}
+            {showChatPopup && (
+                <ChatMessageBox
+                    gatheringId={moim.id}
+                    memberId={user?.userId}
+                    onClose={() => setShowChatPopup(false)}
+                />
+            )}
         </div>
+
     );
 }
 

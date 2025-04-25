@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { getInvitation, postSendEmail } from "../../api/moimAPI";
-import {  useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const InviteMoim = ({moim_id, moim_category}) => {
   const [qrUrl, setQrUrl] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
   const [email, setEmail] = useState('');
+  const user = useSelector(state => state.user.user)
+  const nickname = user.nickname;
 
   useEffect(() => {
     const fetchInviteData = async () => {
         try {
-        const data = await getInvitation(moim_id);
+        const data = await getInvitation(moim_id, moim_category);
+        console.log("cate: ",moim_category)
         console.log("data:", data)
         setQrUrl(data.qr_url);
         setInviteUrl(data.invite_url);
@@ -30,17 +33,32 @@ const InviteMoim = ({moim_id, moim_category}) => {
   const handleEmailInput = async () => {
 
     try {
-      const response = await postSendEmail(moim_id, moim_category, email);
+      const response = await postSendEmail(moim_id, moim_category, email, nickname);
       console.log('response: ', response)
+      const statusCode = response.data.statusCode;
 
-      if (response.data.statusCode === 200) {
-        // setEmailSent(true);
-        setEmail(''); 
-        alert("모임 초대 이메일이 발송되었습니다")
+      if (statusCode === 200) {
+        setEmail('');
+        alert("모임 초대 이메일이 성공적으로 발송되었습니다.");
         console.log("이메일 전송 성공");
-      }  else {
-        console.log("이메일 전송 실패.statusCode:", response.data.statusCode);
+  
+      } else if (statusCode === 403) {
+        alert("사용자 메일 인증이 되어 있지 않아 이메일을 전송할 수 없습니다.\n이메일을 확인해 인증을 완료해주세요.");
+        console.log("이메일 전송 실패: SES 인증 오류");
+  
+      } else if (statusCode === 404) {
+        alert("해당 이메일을 가진 사용자가 존재하지 않습니다.\n이메일 주소를 다시 확인해 주세요.");
+        console.log("이메일 전송 실패: 사용자 없음");
+  
+      } else if (statusCode === 500) {
+        alert("서버 오류로 인해 이메일 전송에 실패했습니다.\n잠시 후 다시 시도해 주세요.");
+        console.log("이메일 전송 실패: 서버 오류");
+  
+      } else {
+        alert("알 수 없는 오류가 발생했습니다. 콘솔을 확인해 주세요.");
+        console.log("이메일 전송 실패: 알 수 없는 오류", statusCode);
       }
+      
     } catch (error) {
         console.error(error);
     }
