@@ -3,17 +3,90 @@ import MoimPostComponent from "./component/post/MoimPostComponent";
 import MoimRecentPostCard from "./component/moim/MoimRecentPostCard";
 import ProfileCard from "./component/moim/ProfileCard";
 import MoimPostView from "./component/post/MoimPostViewCard";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
 import PhotoGallery from "./component/PhotoGallery";
 import MoimPostCalanderComponent from "./component/post/MoimPostCalanderComponent";
+import { getAllPostImages, getPagePostByMoimId, postPagePostByMoimId, putExitMoim } from "../../api/moimAPI";
 
 
-const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
+const MoimMainLayout = ({ moim, user }) => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     const [isOpenPost, setIsOpenPost] = useState(false)
     const [activeTab, setActiveTab] = useState("home");
     const [selectedPost, setSelectedPost] = useState(null); // 게시글 상세 보기용
+    const [posts, setPosts] = useState([]);
+    const [reloadTrigger, setReloadTrigger] = useState(false);
+    const [pageKey, setPageKey] = useState(null)
+    const [postImgRes, setPostImgRes] = useState([])
+
+    const id = searchParams.get('moimid');
+
     const nav = useNavigate()
+
+    const getMoimPosts = async (id, limit = 5, key = null) => {
+        if (!id) return;
+
+        try {
+            // 게시글과 이미지 병렬 요청
+            const [postResRaw, imageResRaw] = await Promise.all([
+                postPagePostByMoimId(id, limit, key),
+                postImgRes.length === 0
+                    ? getAllPostImages(id, 'moim-post-images')
+                    : Promise.resolve(JSON.stringify(postImgRes)) 
+            ]);
+            const postRes = JSON.parse(postResRaw);
+            setPageKey(postRes.last_evaluated_key)
+
+            const images = postImgRes.length === 0 ? JSON.parse(imageResRaw) : postImgRes;
+
+            setPostImgRes(images);
+            
+
+            // 게시글에 이미지 매핑
+            const newPosts = postRes.posts.map(post => {
+                const matched = images.filter(img => img.post_id === post.id);
+                return {
+                    ...post,
+                    files: matched.length > 0 ? matched[0].files : []
+                };
+            });
+            
+            setPosts(prevPosts => {
+                // 중복된 게시글 처리
+                const uniqueNewPosts = newPosts.filter(newPost =>
+                    !prevPosts.some(prevPost => prevPost.id === newPost.id)
+                );
+
+                return [...prevPosts, ...uniqueNewPosts];
+            });
+        } catch (error) {
+            console.error("오류 발생:", error);
+        }
+    };
+
+
+    const handleReload = () => {
+        setReloadTrigger(prev => !prev);
+    };
+
+    useEffect(() => {
+        if (id === null) return
+        getMoimPosts(id, 5, pageKey);
+    }, [id, reloadTrigger]);
+
+    const handleOnExitMoim=()=>{
+        if(!window.confirm('정말 탈퇴하시겠습니까?'))
+            return
+        putExitMoim(moim.id, moim.category, user.userId).then(d=>{
+            console.log(d)
+            alert('모임을 탈퇴했습니다')
+        }).catch(e=>{
+            console.log('error', e)
+        })
+    }
+
 
     return (
         <div className="bg-gray-50 min-h-screen py-6 px-4 flex justify-center font-[Pretendard]">
@@ -52,7 +125,6 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                                 : <></>}
 
                             <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e => nav(`/chat/${moim.id}`)}>채팅</button>
-                            <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
                             <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e => setActiveTab('inviteMember')}>
                                 <svg
                                     className="w-4 h-4"
@@ -70,21 +142,23 @@ const MoimMainLayout = ({ moim, user, posts, handlePostCreated }) => {
                                 </svg>
                                 <span>멤버초대하기</span>
                             </div>
+                            <div className="text-gray-500 cursor-pointer hover:underline" onClick={handleOnExitMoim}>모임 탈퇴</div>
+
                         </div>
                     </aside>
                     <div className="col-span-2 min-h-[500px] max-h-[500px]">
                         {activeTab === "home" && (
-                            <MoimPostComponent isOpenPost={isOpenPost} moim={moim} user={user} posts={posts} onPostCreated={handlePostCreated} onSelectPost={(post) => {
+                            <MoimPostComponent isOpenPost={isOpenPost} moim={moim} user={user} posts={posts} reloadTrigger={handleReload} onSelectPost={(post) => {
                                 setSelectedPost(post);
                                 setActiveTab("postDetail");
                             }} />
                         )}
-                        {activeTab === "photo" && <PhotoGallery posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
+                        {activeTab === "photo" && <PhotoGallery posts={posts} photos={postImgRes} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {activeTab === "schedule" && <MoimPostCalanderComponent moim={moim} posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {/* {activeTab === "member" && <MemberList moim={moim} />} */}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
-                            <MoimPostView user={user} post={selectedPost} updatePost={handlePostCreated} onBack={() => setActiveTab("home")} />
+                            <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} onBack={() => setActiveTab("home")} />
                         )}
                     </div>
                     <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />

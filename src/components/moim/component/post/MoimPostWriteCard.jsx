@@ -18,7 +18,7 @@ const initState = {
     files: []
 };
 // 게시글 작성
-const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
+const MoimPostWriteCard = ({ moim, user, reloadTrigger }) => {
     const [post, setPost] = useState({ ...initState });
     const [selectedDate, setSelectedDate] = useState(null);
     const [showSchedule, setShowSchedule] = useState(false);
@@ -30,18 +30,28 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
 
     const datePickerRef = useRef(null);
 
-    const formatDateTime = (date) => {
-        if (!date) return "날짜를 선택하세요";
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, "0");
-        const dd = String(date.getDate()).padStart(2, "0");
-        const hh = String(date.getHours()).padStart(2, "0");
-        const min = String(date.getMinutes()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
-    };
+const formatDateTime = (date) => {
+    if (!date) return "날짜를 선택하세요";
+
+    const kstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+
+    const yyyy = kstDate.getFullYear();
+    const mm = String(kstDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(kstDate.getDate()).padStart(2, "0");
+    const hh = String(kstDate.getHours()).padStart(2, "0");
+    const min = String(kstDate.getMinutes()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+};
+
 
     const handleOnCheck = (e) => {
         const ptype = e.target.checked ? "Notice" : "";
+        if (ptype === "Notice" && showSchedule) {
+            alert('공지사항에 일정을 등록 할 수 없습니다')
+            e.target.checked = false
+            return
+        }
         setPost({ ...post, post_type: ptype });
     };
 
@@ -116,7 +126,7 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             const finalRes = await postMoimPost(JSON.stringify(finalPost));
             console.log('게시글 등록 결과 : ', finalRes)
             alert('게시글 등록 완료')
-            onPostCreated()
+            reloadTrigger()
         }
         catch (error) {
             console.error('Error Upload or Post', error)
@@ -139,7 +149,14 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
             {/* ✅ 일정 영역 */}
             {!showSchedule ? (
                 <label className="flex items-center space-x-2 text-sm text-gray-700">
-                    <span onClick={() => setShowSchedule(true)} className="text-1xl font-bold cursor-pointer">
+                    <span onClick={() => {
+                        if (post.post_type === "Notice") {
+                            alert('공지사항은 일정을 등록 할 수 없습니다')
+                            return
+                        }
+                        setShowSchedule(true)
+                    }
+                    } className="text-1xl font-bold cursor-pointer">
                         📅 일정 등록
                     </span>
                 </label>

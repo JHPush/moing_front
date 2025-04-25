@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { deleteMoimPost, updateMoimPost } from '../../../../api/moimAPI';
+import { deleteMoimPost, getPresignedURL_PostPut, putUploadMoimImageByPresignedUrl, updateMoimPost } from '../../../../api/moimAPI';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import dayjs from 'dayjs';
@@ -7,8 +7,9 @@ import MoimLocationModal from '../util/MoimPostLocationModal';
 import MoimPostViewMap from './MoimPostViewMap';
 
 // 게시글 보기 수정 삭제 카드
-const MoimPostView = ({ post, user, onBack, updatePost }) => {
+const MoimPostView = ({ post, user, onBack, reloadTrigger }) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [previewFiles, setPreviewFiles] = useState([])
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [editData, setEditData] = useState({
         title: post.title,
@@ -17,7 +18,9 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
         moim_addr: post.moim_addr || '',
         moim_x: post.moim_x || '',
         moim_y: post.moim_y || '',
+        files: []
     });
+
 
     // 3. 장소 선택 핸들러 추가
     const handleLocationSelect = (addr) => {
@@ -43,29 +46,58 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
         });
     };
 
-    const handleOnUpdate = () => {
-        console.log(editData)
-        updateMoimPost({
-            moim_id: post.gathering_id,
-            id: post.id,
-            title: editData.title,
-            content: editData.content,
-            schedule: editData.schedule,
-            moim_addr: editData.moim_addr,
-            moim_x: editData.moim_x,
-            moim_y: editData.moim_y,
-        }).then(data => {
-            if (data.statusCode !== 200) {
-                console.log(data)
-                alert('수정 실패!')
-                return
+    const handleOnUpdate = async () => {
+        const finalPost = { ...editData };
+        try {
+            if (finalPost.files.length > 0) {
+
+                const requestData = finalPost.files.map(file => ({
+                    filename: file.name,
+                    filetype: file.type
+                }))
+
+                const res = await getPresignedURL_PostPut(requestData);
+                const data = JSON.parse(res.data.body)
+
+                const uploadPromises = data.map(async (file, idx) => {
+                    await putUploadMoimImageByPresignedUrl(file.uploadUrl, finalPost.files[idx]);
+                    return file.fileUrl;
+                });
+
+
+                const uploadUrls = await Promise.all(uploadPromises)
+                console.log('uploadUrls : ', uploadUrls)
+                finalPost.files = uploadUrls;
             }
-            updatePost()
-            alert('업데이트 성공');
-            onBack();
-        }).catch(e => {
-            console.log('error : ', e);
-        });
+            console.log(finalPost)
+                updateMoimPost(JSON.stringify({
+                    moim_id: post.gathering_id,
+                    id: post.id,
+                    title: finalPost.title,
+                    content: finalPost.content,
+                    schedule: finalPost.schedule,
+                    moim_addr: finalPost.moim_addr,
+                    moim_x: finalPost.moim_x,
+                    moim_y: finalPost.moim_y,
+                    files: finalPost.files
+                })).then(data => {
+                    if (data.statusCode !== 200) {
+                        console.log(data)
+                        alert('수정 실패!')
+                        return
+                    }
+                    reloadTrigger()
+                    alert('수정 성공');
+                    onBack();
+                }).catch(e => {
+                    console.log('error : ', e);
+                });
+                reloadTrigger()
+        }
+        catch (error) {
+            console.error('Error Upload or Post', error)
+            alert('에러 발생')
+        }
     };
 
     const handleOnDelete = () => {
@@ -74,18 +106,28 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
             id: post.id,
         }).then(data => {
             if (data.statusCode !== 200) {
+                console.log(data)
                 alert('삭제 실패!')
                 return
             }
-
-
-            updatePost()
+            reloadTrigger()
             alert('삭제 성공');
             onBack();
         }).catch(e => {
             console.log('error : ', e);
         });
     };
+    const handleOnFile = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 3) {
+            alert('최대 3개의 파일까지만 등록 가능합니다')
+            return;
+        }
+        setEditData({ ...editData, files: files })
+
+        const previews = files.map(file => URL.createObjectURL(file))
+        setPreviewFiles(previews)
+    }
 
     return (
         <main className="p-8 flex justify-center">
@@ -155,10 +197,55 @@ const MoimPostView = ({ post, user, onBack, updatePost }) => {
                             className="flex-1 text-base text-gray-700 border rounded-md p-3 h-64 resize-none"
                             value={editData.content}
                             onChange={handleChange} />
+
+                        <div className='mt-4 flex justfy-end gap-2'>사진</div>
+                        {(post.files && post.files.length > 0 && previewFiles.length === 0) && (
+                            <div className="grid grid-cols-3 gap-3 mb-6">
+                                {post.files.map((src, index) => (
+                                    <img
+                                        key={index}
+                                        src={src.presigned_url}
+                                        alt={`기존 이미지 ${index + 1}`}
+                                        className="w-full aspect-square object-cover rounded-lg border"
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {previewFiles.length > 0 && (
+                            <div className="grid grid-cols-3 gap-3 mb-6">
+                                {previewFiles.map((src, index) => (
+                                    <div key={index} className="relative group">
+                                        <img
+                                            src={src}
+                                            alt={`새 이미지 ${index + 1}`}
+                                            className="w-full aspect-square object-cover rounded-lg border"
+                                        />
+                                        <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 opacity-0 group-hover:opacity-100 transition">
+                                            새 이미지
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* 툴 */}
+                        <label className="flex justify-center items-center space-x-4 text-gray-500 cursor-pointer mb-4">
+                            📷 사진 등록 (최대 3장)
+                            <input
+                                type="file"
+                                name="snapshot"
+                                multiple
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleOnFile}
+                            />
+                        </label>
+
                         <div className="mt-4 flex justify-end gap-2">
                             <button
                                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
-                                onClick={() => setIsEditing(false)}>
+                                onClick={() => { setIsEditing(false); setPreviewFiles([]) }}>
                                 취소
                             </button>
                             <button

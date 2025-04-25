@@ -24,55 +24,22 @@ const MoimPage = () => {
     const category = searchParams.get('category');
 
     const [moim, setMoim] = useState({ ...initMoimForm });
-    const [posts, setPosts] = useState([]);
-    const [reloadTrigger, setReloadTrigger] = useState(false);
-
-
-
-    const getMoimPosts = async (id) => {
-        try {
-            const postRes = JSON.parse(await getAllPostByMoimId(id));
-            const postImgRes = JSON.parse(await getAllPostImages(id, 'moim-post-images'));
-
-            const newPosts = postRes.map(post => {
-                const matchingImages = postImgRes.filter(img => img.post_id === post.id);
-
-                return {
-                    ...post,
-                    files: matchingImages.length > 0 ? matchingImages[0].files : []
-                };
-            });
-            setPosts(newPosts);
-        } catch (error) {
-            console.error("오류 발생:", error);
-        }
-    };
-
-    const handlePostCreated = () => {
-        setReloadTrigger(prev => !prev);
-    };
-
+    
     useEffect(() => {
-        console.log(user)
         if (moim.name === '') {
             getMoim(id, category)
                 .then(data => {
                     const temp = JSON.parse(data.body);
                     setMoim(temp);
-                    getMoimPosts(temp.id);
                 })
                 .catch(e => console.error("getMoim() 오류:", e));
         }
     }, [id]);
 
-    useEffect(() => {
-        getMoimPosts(id);
-    }, [id, reloadTrigger]); 
-
     return (
         <BasicLayout>
             {user && user.gatherings.includes(moim.id) ? (
-                <MoimMainLayout moim={moim} user={user} posts={posts}  handlePostCreated={handlePostCreated} />
+                <MoimMainLayout moim={moim} user={user}  />
             ) : (
                 <IntroductionMoim moim={moim} user={user} />
             )}

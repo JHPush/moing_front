@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
+import { getMoim, getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
 import SelectLocation from './MoimSelectLocation';
 import { hangjungdong } from "../../assets/data/hangjungdong"
 import { useSelector } from 'react-redux';
@@ -17,8 +17,8 @@ const initMoimForm = {
     // gender:'',
     // age:''
     snapshot: '',
-    x:'',
-    y:''
+    x: '',
+    y: ''
 }
 
 const CreateMoim = () => {
@@ -29,9 +29,11 @@ const CreateMoim = () => {
     const [snapshots, setSnapshots] = useState([]);
     const [profile, setProfile] = useState(null)
     const [showLocationModal, setShowLocationModal] = useState(false);
+    const [nameError, setNameError] = useState('');
+
 
     const handleSelectLocation = (e) => {
-        setMoim({ ...moim, ['region']: e.address_name, x:e.x, y:e.y })
+        setMoim({ ...moim, ['region']: e.address_name, x: e.x, y: e.y })
 
         setShowLocationModal(false);
         console.log(moim)
@@ -41,7 +43,7 @@ const CreateMoim = () => {
         setMoim({ ...moim, [e.target.name]: e.target.value })
     }
 
-    const handleCreateMoing = (e) => {
+    const handleCreateMoing = async (e) => {
         let checkDouble = false
 
         if (moim.name == '' || moim.introduction_content.length < 10 || moim.category == '' || moim.region == '' || profile == null) {
@@ -53,6 +55,13 @@ const CreateMoim = () => {
             alert('로그인 정보 없음, 다시 로그인하세요')
             nav('/', { replace: true })
             return
+        }
+        const res = await getMoim('moing.us-' + moim.name, moim.category);
+        if (res.statusCode === 200) {
+            setNameError('이미 사용 중인 모임 이름입니다.');
+            return;
+        } else {
+            setNameError('');
         }
         convertUrlToFile(profile).then(file => {
             getPresignedURL_put(file.name, file.type).then(data => {
@@ -67,7 +76,7 @@ const CreateMoim = () => {
                         console.log("Request S3 Start !! ")
                         putUploadMoimImageByPresignedUrl(temp['upload_url'], file).then(() => {
                             postCreateMoing(updateMoim).then(data => {
-                                if(data.statusCode !== 200){
+                                if (data.statusCode !== 200) {
                                     alert('모임 생성 실패')
                                     console.log(data)
                                     return
@@ -110,16 +119,21 @@ const CreateMoim = () => {
                 {/* 모임 이름 */}
                 <div className="mb-6">
                     <h2 className="text-left text-xl font-semibold text-gray-500 mb-4">모임 생성</h2>
-                    {(
-                        <input
-                            name='name'
-                            className="text-2xl font-bold w-full border-b border-gray-300 focus:outline-none focus:border-blue-500"
-                            value={moim.name}
-                            placeholder='모임 이름 입력'
-                            onChange={handleUpdateMoim}
-                            autoFocus
-                        />
-                    )}
+
+                    <input
+                        name='name'
+                        className={`text-2xl font-bold w-full border-b focus:outline-none
+                            ${nameError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                        value={moim.name}
+                        placeholder='모임 이름 입력'
+                        onChange={(e) => {
+                            handleUpdateMoim(e);
+                            setNameError(''); // 입력 중에는 에러 초기화
+                        }}
+                        autoFocus
+                    />
+                    {nameError && <p className="text-sm text-red-500 mt-2">{nameError}</p>}
+
                 </div>
 
                 {/* 이미지 선택 */}

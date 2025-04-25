@@ -4,7 +4,10 @@ const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/
 const MOING_API_URL = '/moing/detail'
 const MOING_JOIN_URI = '/join'
 const MOING_POST_URI = '/post'
+const MOING_EXIT_URI = '/exit'
+const MOING_PAGE_POST_URI = '/post/page'
 const MOING_GET_IMAGES_URI = '/post/images'
+const MOIMG_GET_SCHEDULED_URI = '/post/scheduled'
 const MOING_PRESIGN_URL_PUT = '/sequre/puts'
 const MOING_PRESIGN_URL_GET = '/sequre/gets'
 const MOING_POST_PRESIGN_URL_POST = '/sequre/post'
@@ -25,6 +28,10 @@ export const getPresignedURL_put = async (name, type) => {
     })).data.body;
 }
 
+export const getScheduledPostByMoim = async (moim_id)=>{
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOIMG_GET_SCHEDULED_URI}`, {params: {'moim_id' : moim_id}})).data
+}
+
 
 export const getPresignedURL_PostPut = async (urls) =>{
     return (await axios.post(`${PREFIX_URL + MOING_POST_PRESIGN_URL_POST}`, urls, {
@@ -32,6 +39,11 @@ export const getPresignedURL_PostPut = async (urls) =>{
             'Content-Type': 'application/json'
         },
     }));
+}
+export const putExitMoim = async (moimid, moimcategory, userid)=>{
+    return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_EXIT_URI}`
+            , { moimid: moimid, moimcategory: moimcategory, userid: userid },
+            { headers: { 'Content-Type': 'application/json' } })).data;
 }
 
 export const getAllPostImages = async (moim_id, bucketName)=>{
@@ -41,6 +53,16 @@ export const getAllPostImages = async (moim_id, bucketName)=>{
 export const getAllPostByMoimId = async(moim_id)=>{
     return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, {params: {'moim_id' : moim_id}})).data.body
 }
+export const postPagePostByMoimId = async (moim_id, limit, key = null) => {
+    const body = {
+        moim_id,
+        limit,
+        ...(key && { exclusive_start_key: key })
+    };
+
+    return (await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_PAGE_POST_URI}`, body)).data.body;
+};
+
 
 export const getPresignedURL_get = async (fileurl, bucketName) => {
     return (await axios.get(`${PREFIX_URL + MOING_PRESIGN_URL_GET}`, { params: { 'fileurl': fileurl, 'bucket':bucketName } })).data;

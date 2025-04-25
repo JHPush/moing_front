@@ -3,6 +3,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import ko from 'date-fns/locale/ko';
 import { useEffect, useState } from 'react';
+import { getScheduledPostByMoim } from '../../../../api/moimAPI';
 
 const locales = { ko };
 const localizer = dateFnsLocalizer({
@@ -20,10 +21,11 @@ const MyCustomToolbar = ({ label, onNavigate }) => (
     </div>
 );
 
-const MoimPostCalendarComponent = ({ moim, posts,selectedPost }) => {
+const MoimPostCalendarComponent = ({ moim ,selectedPost }) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [events, setEvents] = useState([]);
+    const [posts, setPosts] = useState([]);
 
     useEffect(() => {
         if (posts.length === 0) return;
@@ -45,6 +47,31 @@ const MoimPostCalendarComponent = ({ moim, posts,selectedPost }) => {
 
         setEvents(eventList);
     }, [posts]);
+
+    const getPostsByScheduled = async ()=>{
+        if(!moim.id || moim.id === ''){
+            console.log('모임 아이디가 없는데?')
+            return
+        }
+        console.log('스케줄 불러오는중...')
+        
+        const res = await getScheduledPostByMoim(moim.id)
+        if(!res || res.statusCode != 200){
+            console.error('error', res)
+            alert('게시글 불러오기가 실패하는데?')
+        }
+        const temp =JSON.parse(res.body)
+        console.log('res is ', temp) 
+        setPosts(temp)
+    }
+
+    useEffect(()=>{
+        if(posts.length>0) return
+
+        getPostsByScheduled()
+
+    }, [])
+
 
     const handleDateSelect = (slotInfo) => {
         console.log('22')
