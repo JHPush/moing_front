@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { userPool } from '../../aws-config';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getUserData } from '../../api/userAPI';  // 사용자 정보 가져오기 API 호출
 import { useWebSocket } from '../../contexts/WebSocketContext';
 import { saveUserToCookies } from '../../utils/cookieUtils';
@@ -14,6 +14,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { connectOnLogin } = useWebSocket(); 
+  const user123 = useSelector((state) => state.user.user);
 
   const handleChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -58,12 +59,13 @@ const LoginPage = () => {
 
           dispatch(setUser(userInfo));
           saveUserToCookies(userInfo);
-
-          //  WebSocket 연결
-          connectOnLogin(userData.userId);
+          
 
           alert('로그인 성공!');
-          navigate('/');      
+          navigate('/');  
+
+          //  WebSocket 연결
+          connectOnLogin(userData.userId);    
 
         } catch (error) {
           alert('사용자 정보를 가져오는 데 실패했습니다.');

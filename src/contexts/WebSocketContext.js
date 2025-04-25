@@ -9,13 +9,15 @@ export const WebSocketProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const reconnectInterval = useRef(null);
   const pingInterval = useRef(null);
-  
+  console.log("socket:", socket)
   const connectWebSocket = (userId) => {
     const url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${userId}`;
     const ws = new WebSocket(url);
+    console.log(userId)
 
     ws.onopen = () => {
       console.log('✅ WebSocket 연결 성공');
+  
       setSocket(ws);
 
       // 주기적인 ping 메시지
@@ -32,7 +34,7 @@ export const WebSocketProvider = ({ children }) => {
       clearInterval(pingInterval.current);
       setSocket(null);
 
-      // 자동 재연결 시도
+      //자동 재연결 시도
       // if (userId) {
       //   console.log(userId)
       //   console.log("재연결 시도중")
@@ -51,7 +53,8 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const connectOnLogin = (userId) => {
-    setUserId(userId);
+    console.log(userId)
+    //setUserId(userId);
     connectWebSocket(userId);
 
   };
@@ -63,7 +66,7 @@ export const WebSocketProvider = ({ children }) => {
     if (socket) {
       socket.close();
       setSocket(null);
-      setUserId(null)
+      // setUserId(null)
     }
     clearInterval(pingInterval.current);
     clearTimeout(reconnectInterval.current);
