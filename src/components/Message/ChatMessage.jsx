@@ -4,19 +4,21 @@ import { useSelector } from "react-redux";
 import { loadInitialMessages  } from "../../api/chatAPI";
 import { useWebSocket } from "../../contexts/WebSocketContext";
 
-const ChatMessage = () =>{
+const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =>{
 
-    const {gatheringId} = useParams();
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const memberId = queryParams.get('memberId');
+
     const {socket} = useWebSocket();
-
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
     const messagesEndRef = useRef(null);
 
     const user = useSelector(state => state.user.user)
+    const params = useParams();
+    const gatheringId = propGatheringId ?? params.gatheringId;
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const memberId = propMemberId || queryParams.get('memberId');
 
     useEffect(()=>{
         // 기존 메시지 로드
@@ -37,10 +39,14 @@ const ChatMessage = () =>{
 
       useEffect(() => {
         if (!socket) return;
-    
+        console.log("socket:", socket)
         const handleMessage = (event) => {
           const response = JSON.parse(event.data);
           console.log("받은 데이터:", response);
+          console.log(response.type)
+          if(response.type !== 'chat') {
+            return;
+          }
           setMessages((prev) => [...prev, response]);
         };
     

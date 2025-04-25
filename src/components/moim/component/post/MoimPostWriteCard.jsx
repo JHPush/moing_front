@@ -15,6 +15,7 @@ const initState = {
     moim_addr: "",
     moim_x: "",
     moim_y: "",
+    category: "",
     files: []
 };
 // 게시글 작성
@@ -26,7 +27,6 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
     const [imageFiles, setImageFiles] = useState([])
     const [previewFiles, setPreviewFiles] = useState([])
     const [imageUrls, setImageUrls] = useState([])
-
 
     const datePickerRef = useRef(null);
 
@@ -52,6 +52,7 @@ const MoimPostWriteCard = ({ moim, user, onPostCreated }) => {
                 moim_id: moim.id,
                 member_id: user.userId,
                 member_name: user.name,
+                category: moim.category
             }));
         }
     }, []);

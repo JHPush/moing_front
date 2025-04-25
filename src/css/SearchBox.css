@@ -50,3 +50,11 @@
 .search-button:hover {
     background-color: #45a049;
 }
+
+.back-button {
+  padding: 6px 10px;
+  background-color: #add8e6;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}

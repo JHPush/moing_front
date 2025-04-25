@@ -3,16 +3,35 @@ import MoimPostComponent from "./component/post/MoimPostComponent";
 import MoimRecentPostCard from "./component/moim/MoimRecentPostCard";
 import ProfileCard from "./component/moim/ProfileCard";
 import MoimPostView from "./component/post/MoimPostViewCard";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import InviteMoim from "./InviteMoim";
 import PhotoGallery from "./component/PhotoGallery";
+import ChatMessageBox from "../Message/ChatMessageBox";
+
+
+
 
 
 const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
     const [isOpenPost, setIsOpenPost] = useState(false)
     const [activeTab, setActiveTab] = useState("home");
     const [selectedPost, setSelectedPost] = useState(null); // 게시글 상세 보기용
+    const [showChatPopup, setShowChatPopup] = useState(false); 
     const nav = useNavigate()
+
+    const location = useLocation();
+    useEffect(() => {
+        if (location.state?.activeTab === "postDetail" && location.state?.postId) {
+            const targetPost = posts.find(p => String(p.id) === String(location.state.postId));
+
+            if (targetPost) {
+                setSelectedPost(targetPost);
+                setActiveTab("postDetail");
+            }
+        }
+    }, [location.state, posts]);
+
+
 
     return (
         <div className="bg-gray-50 min-h-screen py-6 px-4 flex justify-center font-[Pretendard]">
@@ -47,7 +66,14 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
                         <ProfileCard moim={moim} user={user} />
                         <div className="text-sm space-y-2 pl-2">
                             <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
-                            <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={e=> nav(`/chat/${moim.id}`)}>채팅</button>
+                            
+                            <button
+                                className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md"
+                                onClick={() => setShowChatPopup(true)}
+                            >
+                                채팅
+                            </button>
+
                             <div className="text-gray-500 cursor-pointer hover:underline">불법 모임 신고</div>
                             <div className="flex items-center text-gray-700 space-x-2 cursor-pointer hover:underline" onClick={e=> setActiveTab('inviteMember')}>
                                 <svg
@@ -87,7 +113,16 @@ const MoimMainLayout = ({ moim, user, posts,files, handlePostCreated }) => {
 
                 </div>
             </div>
+                  {/* 채팅 팝업 */}
+            {showChatPopup && (
+                <ChatMessageBox
+                gatheringId={moim.id}
+                memberId={user?.userId}
+                onClose={() => setShowChatPopup(false)}
+                />
+            )}
         </div>
+        
     );
 }
 

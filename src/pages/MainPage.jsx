@@ -13,7 +13,7 @@ const MainPage = () => {
 }
   return (
     <BasicLayout>
-              <form onSubmit={handleSearch} className="search-form">
+              {/* <form onSubmit={handleSearch} className="search-form">
             <input
                 type="text"
                 value={keyword}
@@ -27,7 +27,7 @@ const MainPage = () => {
             >
                 검색
             </button>
-        </form>
+        </form> */}
 
       <GroupView/>
     </BasicLayout> 
