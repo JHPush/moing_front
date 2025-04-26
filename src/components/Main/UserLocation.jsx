@@ -160,29 +160,19 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
     return(
         <> 
       {loading ? (
-        <p style={{ fontSize: '14px' }}>📍 위치 정보 가져오는 중...</p>
+        <div className="gps-status">
+          <div className="gps-loading-spinner"></div>
+          <span>위치 정보 가져오는 중...</span>
+        </div>
       ) : userDong ? (
-        <button onClick={handleUpdateLocation} className="gps-button" style={{
-          backgroundColor: "#f0f0f0",
-          border: "1px solid #ccc",
-          padding: "6px 10px",
-          borderRadius: "5px",
-          fontSize: "14px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center"
-        }}>
-          <LocateFixed size={18} style={{ marginRight: '6px' }} />내 위치
+        <button onClick={handleUpdateLocation} className="gps-button">
+          <LocateFixed size={18} />내 위치
         </button>
       ) : (
-        <p style={{ fontSize: '14px' }}>📍 위치 정보를 가져올 수 없습니다</p>
-      )}     
-             {/* <div>
-             <button onClick={handleUpdateLocation} className="gps-button">
-             <LocateFixed size={18} style={{ marginRight: '5px' }} /> 
-             {userDong}
-            </button>
-        </div> */}
+        <button className="gps-button gps-error" onClick={handleUpdateLocation}>
+          <LocateFixed size={18} />위치 정보 없음
+        </button>
+      )}
         </>
     )
 }
