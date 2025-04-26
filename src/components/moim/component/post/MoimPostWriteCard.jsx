@@ -18,32 +18,44 @@ const initState = {
     category: "",
     files: []
 };
+
+// Character limits
+const TITLE_MIN_LENGTH = 1;
+const TITLE_MAX_LENGTH = 25;
+const CONTENT_MIN_LENGTH = 1;
+const CONTENT_MAX_LENGTH = 200;
+
 // 게시글 작성
-const MoimPostWriteCard = ({ moim, user, reloadTrigger }) => {
+const MoimPostWriteCard = ({ moim, user, reloadTrigger, handleFinishPostWriteOrUpdate }) => {
     const [post, setPost] = useState({ ...initState });
     const [selectedDate, setSelectedDate] = useState(null);
     const [showSchedule, setShowSchedule] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(false);
-    const [imageFiles, setImageFiles] = useState([])
-    const [previewFiles, setPreviewFiles] = useState([])
-    const [imageUrls, setImageUrls] = useState([])
+    const [imageFiles, setImageFiles] = useState([]);
+    const [previewFiles, setPreviewFiles] = useState([]);
+    const [imageUrls, setImageUrls] = useState([]);
+    
+    // Character count states
+    const [titleCharCount, setTitleCharCount] = useState(0);
+    const [contentCharCount, setContentCharCount] = useState(0);
+    const [isTitleExceeded, setIsTitleExceeded] = useState(false);
+    const [isContentExceeded, setIsContentExceeded] = useState(false);
 
     const datePickerRef = useRef(null);
 
-const formatDateTime = (date) => {
-    if (!date) return "날짜를 선택하세요";
+    const formatDateTime = (date) => {
+        if (!date) return "날짜를 선택하세요";
 
-    const kstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+        const kstDate = new Date(date.getTime());
 
-    const yyyy = kstDate.getFullYear();
-    const mm = String(kstDate.getMonth() + 1).padStart(2, "0");
-    const dd = String(kstDate.getDate()).padStart(2, "0");
-    const hh = String(kstDate.getHours()).padStart(2, "0");
-    const min = String(kstDate.getMinutes()).padStart(2, "0");
+        const yyyy = kstDate.getFullYear();
+        const mm = String(kstDate.getMonth() + 1).padStart(2, "0");
+        const dd = String(kstDate.getDate()).padStart(2, "0");
+        const hh = String(kstDate.getHours()).padStart(2, "0");
+        const min = String(kstDate.getMinutes()).padStart(2, "0");
 
-    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
-};
-
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+    };
 
     const handleOnCheck = (e) => {
         const ptype = e.target.checked ? "Notice" : "";
@@ -61,27 +73,46 @@ const formatDateTime = (date) => {
                 ...prev,
                 moim_id: moim.id,
                 member_id: user.userId,
-                member_name: user.name,
+                member_name: user.nickname,
                 category: moim.category
             }));
         }
     }, []);
 
+    // Check if title length exceeds limit
+    useEffect(() => {
+        setTitleCharCount(post.title.length);
+        setIsTitleExceeded(post.title.length > TITLE_MAX_LENGTH);
+    }, [post.title]);
+
+    // Check if content length exceeds limit
+    useEffect(() => {
+        setContentCharCount(post.content.length);
+        setIsContentExceeded(post.content.length > CONTENT_MAX_LENGTH);
+    }, [post.content]);
 
     const handleOnFile = (e) => {
-
         const files = Array.from(e.target.files);
         if (files.length > 3) {
-            alert('최대 3개의 파일까지만 등록 가능합니다')
+            alert('최대 3개의 파일까지만 등록 가능합니다');
             return;
         }
-        setImageFiles(files)
+        setImageFiles(files);
 
-        const previews = files.map(file => URL.createObjectURL(file))
-        setPreviewFiles(previews)
+        const previews = files.map(file => URL.createObjectURL(file));
+        setPreviewFiles(previews);
+    };
 
-    }
-
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        
+        // if ((name === 'title' && value.length > TITLE_MAX_LENGTH) || 
+        //     (name === 'content' && value.length > CONTENT_MAX_LENGTH)) {
+        //     return;
+        // }
+        
+        setPost({ ...post, [name]: value });
+    };
 
     const handleOnRegister = async () => {
         const ptype = selectedDate ? "Scheduled" : "Normal";
@@ -91,54 +122,64 @@ const formatDateTime = (date) => {
             post_type: post.post_type === "Notice" ? post.post_type : ptype,
         };
 
-        if (finalPost.title === '' || finalPost.content === '') {
-            alert("모두 작성해주세요");
+        // Check for empty fields
+        if (finalPost.title.length < TITLE_MIN_LENGTH || finalPost.content.length < CONTENT_MIN_LENGTH) {
+            alert("제목과 내용을 모두 작성해주세요");
             return;
         }
+
+        // Check for exceeded character limits
+        if (finalPost.title.length > TITLE_MAX_LENGTH) {
+            alert(`제목 글자수가 초과되었습니다. (현재: ${titleCharCount}자)`);
+            return;
+        }
+
+        if (finalPost.content.length > CONTENT_MAX_LENGTH) {
+            alert(`내용 글자수가 초과 되었습니다. (현재: ${contentCharCount}자)`);
+            return;
+        }
+
+        // Check for schedule requirements
         if (showSchedule && (selectedDate === null || finalPost.moim_addr === '' || finalPost.moim_x === '')) {
-            console.log(post)
             alert("일정 혹은 모임 위치를 등록해주세요");
             return;
         }
 
         try {
             if (imageFiles.length > 0) {
-
-                setImageUrls([])
+                setImageUrls([]);
                 const requestData = imageFiles.map(file => ({
                     filename: file.name,
                     filetype: file.type
-                }))
+                }));
 
                 const res = await getPresignedURL_PostPut(requestData);
-                const data = JSON.parse(res.data.body)
+                const data = JSON.parse(res.data.body);
 
                 const uploadPromises = data.map(async (file, idx) => {
                     await putUploadMoimImageByPresignedUrl(file.uploadUrl, imageFiles[idx]);
                     return file.fileUrl;
                 });
 
-
-                const uploadUrls = await Promise.all(uploadPromises)
-                console.log('uploadUrls : ', uploadUrls)
+                const uploadUrls = await Promise.all(uploadPromises);
+                console.log('uploadUrls : ', uploadUrls);
                 finalPost.files = uploadUrls;
             }
 
             const finalRes = await postMoimPost(JSON.stringify(finalPost));
-            console.log('게시글 등록 결과 : ', finalRes)
-            alert('게시글 등록 완료')
-            reloadTrigger()
+            console.log('게시글 등록 결과 : ', finalRes);
+            alert('게시글 등록 완료');
+            handleFinishPostWriteOrUpdate();
+            reloadTrigger();
         }
         catch (error) {
-            console.error('Error Upload or Post', error)
-            alert('에러 발생')
+            console.error('Error Upload or Post', error);
+            alert('에러 발생');
         }
-
-    }
+    };
 
     return (
         <div className="space-y-3">
-
             {/* ✅ 공지사항 */}
             {moim.owner_id === user.userId && (
                 <label className="flex items-center space-x-2 text-sm text-gray-700">
@@ -230,22 +271,34 @@ const formatDateTime = (date) => {
             )}
 
             {/* 제목 */}
-            <input
-                name="title"
-                type="text"
-                placeholder="제목을 입력해주세요."
-                className="w-full p-2 border rounded-md text-sm"
-                onChange={(e) => setPost({ ...post, [e.target.name]: e.target.value })}
-            />
+            <div className="relative">
+                <input
+                    name="title"
+                    type="text"
+                    placeholder="제목을 입력해주세요."
+                    className={`w-full p-2 border rounded-md text-sm ${isTitleExceeded ? 'border-red-500' : ''}`}
+                    onChange={handleInputChange}
+                    value={post.title}
+                />
+                <div className={`flex justify-end text-xs mt-1 ${isTitleExceeded ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
+                    {titleCharCount}/{TITLE_MAX_LENGTH}
+                </div>
+            </div>
 
             {/* 내용 */}
-            <textarea
-                name="content"
-                rows="3"
-                placeholder="새로운 소식을 남겨보세요."
-                className="w-full p-2 border rounded-md text-sm"
-                onChange={(e) => setPost({ ...post, [e.target.name]: e.target.value })}
-            ></textarea>
+            <div className="relative">
+                <textarea
+                    name="content"
+                    rows="3"
+                    placeholder="새로운 소식을 남겨보세요."
+                    className={`w-full p-2 border rounded-md text-sm ${isContentExceeded ? 'border-red-500' : ''}`}
+                    onChange={handleInputChange}
+                    value={post.content}
+                ></textarea>
+                <div className={`flex justify-end text-xs mt-1 ${isContentExceeded ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
+                    {contentCharCount}/{CONTENT_MAX_LENGTH}
+                </div>
+            </div>
 
             {/* 툴 */}
             <label className="flex justify-center items-center space-x-4 text-gray-500 cursor-pointer">

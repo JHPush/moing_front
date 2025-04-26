@@ -24,7 +24,7 @@ const MoimPage = () => {
     const category = searchParams.get('category');
 
     const [moim, setMoim] = useState({ ...initMoimForm });
-    
+
     useEffect(() => {
         if (moim.name === '') {
             getMoim(id, category)
@@ -36,10 +36,19 @@ const MoimPage = () => {
         }
     }, [id]);
 
+    const moimRefreshHandler = () => {
+        getMoim(id, category)
+            .then(data => {
+                const temp = JSON.parse(data.body);
+                setMoim(temp);
+            })
+            .catch(e => console.error("getMoim() 오류:", e));
+    }
+
     return (
         <BasicLayout>
             {user && user.gatherings.includes(moim.id) ? (
-                <MoimMainLayout moim={moim} user={user}  />
+                <MoimMainLayout moim={moim} user={user} moimRefresh={moimRefreshHandler} />
             ) : (
                 <IntroductionMoim moim={moim} user={user} />
             )}

@@ -6,6 +6,16 @@ import { useEffect } from "react";
 import { loadUserFromCookies } from "./utils/cookieUtils";
 import { setUser } from "./store/userSlice";
 
+import { LoadingContext, useLoading } from './contexts/LoadingContext';
+import GlobalLoading from './utils/GlobalLoading';
+import { loadingController } from './utils/loadingController';
+
+const GlobalLoaderBridge = () => {
+    const { startLoading, stopLoading } = useLoading();
+    loadingController.setHooks(startLoading, stopLoading);
+    return null;
+};
+
 function App() {
   const dispatch = useDispatch();
 
@@ -17,7 +27,11 @@ function App() {
   }, []);
   return (
     <WebSocketProvider>
-    <RouterProvider router={root}/>
+      <LoadingContext>
+            <GlobalLoaderBridge /> {/* Axios와 연결 */}
+            <GlobalLoading /> {/* 실제 로딩 표시 */}
+            <RouterProvider router={root}/>
+        </LoadingContext>
     </WebSocketProvider>
   );
 }
