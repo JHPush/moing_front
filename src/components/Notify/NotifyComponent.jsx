@@ -215,7 +215,8 @@ const NotifyComponent = ({socket}) => {
 
                 return (
                   <li
-                  key={msg.id || idx}
+                  // key={msg.id || idx}
+                  key={`${msg.id}-${msg.post_id}`}
                   onClick={() => handleNotificationClick(n)}
                   className={`relative p-3 border-b text-sm hover:bg-gray-100 ${
                     msg.is_read ? "text-gray-400" : "font-semibold text-black"

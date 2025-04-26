@@ -40,10 +40,10 @@ const GroupView = () => {
     };
 
     //사용자 근처 모임리스트, 내 위치 받아오기
-    const handleNearbyMeetupsUpdate = (groupList, dong) => {
-        setNearbyMeetups(groupList);
-        setDongName(dong);
-    };
+    // const handleNearbyMeetupsUpdate = (groupList, dong) => {
+    //     setNearbyMeetups(groupList);
+    //     setDongName(dong);
+    // };
 
     //검색상태 체크
     useEffect(() => {
@@ -80,7 +80,8 @@ const GroupView = () => {
 
     return (
         <>
-        <UserLocation onNearbyMeetupsUpdate={handleNearbyMeetupsUpdate} />
+        {/* <UserLocation onNearbyMeetupsUpdate={handleNearbyMeetupsUpdate} /> */}
+
 
         {/* 로그인한 경우에만 MyGroupView 표시 */}
         {user && <MyGroupView />}
@@ -98,6 +99,11 @@ const GroupView = () => {
                     <button type="submit" className="search-button">검색</button>
                 </form>
             </div>
+
+            <UserLocation onNearbyMeetupsUpdate={(groupList, dong) => {
+        setNearbyMeetups(groupList);
+        setDongName(dong);
+        }} />
 
             {/* ✅ 검색 중이면 검색 결과만 보여줌 */}
             {isSearching ? (
@@ -124,6 +130,7 @@ const GroupView = () => {
                 <>        
                     {/* 위치기반 모임 / 전체 모임 */}
                     <div className="text-center" style={{ marginTop: '10px' }}>
+                    {dongName && (
                 <button 
                     onClick={() => setShowAll(false)}
                     style={{
@@ -138,6 +145,7 @@ const GroupView = () => {
                 >
                     "{dongName}" 근처 모임
                 </button>
+                    )}
                 <button 
                     onClick={() => setShowAll(true)}
                     style={{

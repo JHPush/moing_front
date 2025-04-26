@@ -7,6 +7,7 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
 
     const [userLocation, setUserLocation] = useState(null);
     const [userDong, setUserDong] = useState('');
+    const [loading, setLoading] = useState(true);
 
     
     useEffect(() => {
@@ -16,7 +17,7 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(resolve, reject);
                 } else {
-                    reject(new Error("Geolocation is not supported by this browser."));
+                    reject(new Error("이 브라우저는 위치 정보를 지원하지 않습니다."));
                 }
             });
         };
@@ -44,28 +45,57 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
             }
         };
 
-        // 위치 받아오기
-        getUserLocation()
-            .then(async position => {
-                const { latitude, longitude } = position.coords;
-                setUserLocation({ latitude, longitude }); // 위도 경도 저장
-                console.log(userLocation)
+        const fetchLocation = async () => {
+            setLoading(true);
+            try {
+              const position = await getUserLocation();
+              const { latitude, longitude } = position.coords;
+              setUserLocation({ latitude, longitude });
+      
+              const dong = await getAddressFromCoordinates(latitude, longitude);
+              setUserDong(dong);
 
-                const dong = await getAddressFromCoordinates(latitude, longitude);
-                setUserDong(dong);
-                if (!dong) return;
-
+                // 위치 기반 모임 업데이트
                 const response = await getNearbyGroup(latitude, longitude);
                 const groupList = JSON.parse(response.data.body);
+                onNearbyMeetupsUpdate?.(groupList, dong);
 
-                if (onNearbyMeetupsUpdate) {
-                    onNearbyMeetupsUpdate(groupList, dong); 
-                }
-            })
-            .catch(error => {
-                console.error("위치 정보 오류:", error);
-            });
+            } catch (error) {
+              console.error("위치 정보 오류:", error);
+              setUserLocation(null);
+              setUserDong('');
+
+            } finally {
+              setLoading(false);
+            }
+          };
+      
+          fetchLocation();
         }, []);
+
+        // 위치 받아오기
+        // getUserLocation()
+            
+        //     .then(async position => {
+        //         const { latitude, longitude } = position.coords;
+        //         setUserLocation({ latitude, longitude }); // 위도 경도 저장
+        //         console.log(userLocation)
+
+        //         const dong = await getAddressFromCoordinates(latitude, longitude);
+        //         setUserDong(dong);
+        //         if (!dong) return;
+
+        //         const response = await getNearbyGroup(latitude, longitude);
+        //         const groupList = JSON.parse(response.data.body);
+
+        //         if (onNearbyMeetupsUpdate) {
+        //             onNearbyMeetupsUpdate(groupList, dong); 
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error("위치 정보 오류:", error);
+        //     });
+        // }, []);
 
     // 위치 정보가 설정된 후, 근처 모임 데이터를 가져오는 함수
     // const fetchNearbyMeetups = async () => {
@@ -97,13 +127,13 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
     //     }
     // }, [userLocation]); // userLocation이 변경될 때마다 호출
 
-    const updateLocation = (lat, lng) => {
-        // 예: 서버에 위치 전송하거나 상태 업데이트
-        setUserLocation({ lat, lng });
+    // const updateLocation = (lat, lng) => {
+    //     // 예: 서버에 위치 전송하거나 상태 업데이트
+    //     setUserLocation({ lat, lng });
       
-        // nearby 모임 다시 불러오기 등 추가 처리
-        getNearbyGroup(lat, lng);
-      };
+    //     // nearby 모임 다시 불러오기 등 추가 처리
+    //     getNearbyGroup(lat, lng);
+    //   };
       
 
     const handleUpdateLocation = () => {
@@ -113,7 +143,7 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
               const { latitude, longitude } = position.coords;
               console.log("현재 위치:", latitude, longitude);
               // 이 좌표를 백엔드나 상태에 전달하여 위치 기반 모임 업데이트
-              updateLocation(latitude, longitude);
+              setUserLocation({latitude, longitude});
             },
             (error) => {
               console.error("위치 정보를 가져오는데 실패했습니다:", error);
@@ -129,12 +159,30 @@ const UserLocation = ({onNearbyMeetupsUpdate}) =>{
 
     return(
         <> 
-             <div>
+      {loading ? (
+        <p style={{ fontSize: '14px' }}>📍 위치 정보 가져오는 중...</p>
+      ) : userDong ? (
+        <button onClick={handleUpdateLocation} className="gps-button" style={{
+          backgroundColor: "#f0f0f0",
+          border: "1px solid #ccc",
+          padding: "6px 10px",
+          borderRadius: "5px",
+          fontSize: "14px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center"
+        }}>
+          <LocateFixed size={18} style={{ marginRight: '6px' }} />내 위치
+        </button>
+      ) : (
+        <p style={{ fontSize: '14px' }}>📍 위치 정보를 가져올 수 없습니다</p>
+      )}     
+             {/* <div>
              <button onClick={handleUpdateLocation} className="gps-button">
              <LocateFixed size={18} style={{ marginRight: '5px' }} /> 
              {userDong}
             </button>
-        </div>
+        </div> */}
         </>
     )
 }

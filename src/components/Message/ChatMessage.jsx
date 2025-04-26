@@ -37,10 +37,38 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
       }, [gatheringId]);
 
 
+        // WebSocket register 메시지 보내기
+    useEffect(() => {
+      if (!socket) return;
+
+      const handleRegister = () => {
+        const registerMessage = {
+          action: "chat",
+          gathering_id: gatheringId,
+          member_id: user.userId,
+          message: "register",
+        };
+        socket.send(JSON.stringify(registerMessage));
+        console.log("register 메시지 전송됨:", registerMessage);
+      };
+
+      if (socket.readyState === WebSocket.OPEN) {
+        handleRegister();
+      } else {
+        socket.addEventListener("open", handleRegister);
+      }
+
+      return () => {
+        socket.removeEventListener("open", handleRegister);
+      };
+    }, [socket, gatheringId, user.userId]);
+
+    // 메시지 수신 처리
       useEffect(() => {
         if (!socket) return;
         console.log("socket:", socket)
         const handleMessage = (event) => {
+          console.log("event:", event)
           const response = JSON.parse(event.data);
           console.log("받은 데이터:", response);
           console.log(response.type)
@@ -74,6 +102,8 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
         //   }
         // };
 
+
+      // 메시지 전송
         const sendMessage = () => {
             if (messageInput.trim() && socket && socket.readyState === WebSocket.OPEN) {
             const message = {
