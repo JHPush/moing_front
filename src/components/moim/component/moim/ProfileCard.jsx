@@ -34,7 +34,7 @@ const ProfileCard = ({ moim, user, moimRefresh }) => {
             <p className="text-xs text-gray-400 pt-8">Loading image...</p>
           )}
         </div>
-        <h2 className="font-bold text-lg">{moim.name} 모임</h2>
+        <h2 className="font-bold text-lg">{moim.name}</h2>
         <p className="text-sm font-bold text-gray-500">모임장 {moim.owner_nickname}</p>
         <p className="text-xs text-gray-400 mt-1">{moim.short_description}</p>
         <p className="text-sm text-gray-500 mt-2">멤버 {moim.member_count}</p>

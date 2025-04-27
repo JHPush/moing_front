@@ -65,7 +65,10 @@ const CreateMoim = () => {
 
     const handleCreateMoing = async (e) => {
         let checkDouble = false
-
+        if (user.gatherings.length >= 5) {
+            alert(`최대 5개의 모임까지만 생성 가능합니다`)
+            return;
+        }
         if (moim.name.length === 0) {
             alert('모임 이름을 입력해주세요.');
             return;

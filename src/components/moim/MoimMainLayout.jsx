@@ -27,6 +27,7 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
     const [postImgRes, setPostImgRes] = useState([])
     const [showChatPopup, setShowChatPopup] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
+    const nav = useNavigate()
 
     const id = searchParams.get('moimid');
 
@@ -131,6 +132,7 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
         putExitMoim(moim.id, moim.category, user.userId).then(d => {
             console.log(d)
             alert('모임을 탈퇴했습니다')
+            nav('/', {replace:true})
         }).catch(e => {
             console.log('error', e)
         })
@@ -229,7 +231,7 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
                         {activeTab === "member" && <MemberList moim={moim} user={user} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
-                            <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} onBack={() => setActiveTab("home")} />
+                            <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate}  onBack={() => setActiveTab("home")} />
                         )}
                     </div>
                     <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />
