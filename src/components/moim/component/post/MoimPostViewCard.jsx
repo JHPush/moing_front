@@ -7,7 +7,7 @@ import MoimLocationModal from '../util/MoimPostLocationModal';
 import MoimPostViewMap from './MoimPostViewMap';
 
 // 게시글 보기 수정 삭제 카드
-const MoimPostView = ({ post, user, onBack, reloadTrigger }) => {
+const MoimPostView = ({ post, user, onBack, reloadTrigger,handleFinishPostWriteOrUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [previewFiles, setPreviewFiles] = useState([])
     const [showLocationModal, setShowLocationModal] = useState(false);
@@ -86,13 +86,14 @@ const MoimPostView = ({ post, user, onBack, reloadTrigger }) => {
                         alert('수정 실패!')
                         return
                     }
-                    reloadTrigger()
                     alert('수정 성공');
                     onBack();
+                    
+                    reloadTrigger()
+                    handleFinishPostWriteOrUpdate()
                 }).catch(e => {
                     console.log('error : ', e);
                 });
-                reloadTrigger()
         }
         catch (error) {
             console.error('Error Upload or Post', error)
