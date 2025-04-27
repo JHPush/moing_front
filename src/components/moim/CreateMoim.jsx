@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { getMoim, getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
+import { checkMoimName, getMoim, getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
 import SelectLocation from './MoimSelectLocation';
-import { hangjungdong } from "../../assets/data/hangjungdong"
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { convertUrlToFile } from '../../utils/fileUtils';
 
-const { sido, sigugun, dong } = hangjungdong;
+const NAME_MIN_LENGTH = 1;
+const NAME_MAX_LENGTH = 30;
+const INTRO_MIN_LENGTH = 10;
+const INTRO_MAX_LENGTH = 300;
 
 const initMoimForm = {
     owner_id: '',
     name: '',
+    short_description:'',
     introduction_content: '',
     category: '',
     region: '',
@@ -18,7 +21,8 @@ const initMoimForm = {
     // age:''
     snapshot: '',
     x: '',
-    y: ''
+    y: '',
+    owner_nickname:''
 }
 
 const CreateMoim = () => {
@@ -31,6 +35,22 @@ const CreateMoim = () => {
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [nameError, setNameError] = useState('');
 
+    const [nameCharCount, setNameCharCount] = useState(0);
+    const [introCharCount, setIntroCharCount] = useState(0);
+    const [isNameExceeded, setIsNameExceeded] = useState(false);
+    const [isIntroExceeded, setIsIntroExceeded] = useState(false);
+    const [isIntroTooShort, setIsIntroTooShort] = useState(true);
+
+    useEffect(() => {
+        setNameCharCount(moim.name.length);
+        setIsNameExceeded(moim.name.length > NAME_MAX_LENGTH);
+    }, [moim.name]);
+
+    useEffect(() => {
+        setIntroCharCount(moim.introduction_content.length);
+        setIsIntroExceeded(moim.introduction_content.length > INTRO_MAX_LENGTH);
+        setIsIntroTooShort(moim.introduction_content.length < INTRO_MIN_LENGTH);
+    }, [moim.introduction_content]);
 
     const handleSelectLocation = (e) => {
         setMoim({ ...moim, ['region']: e.address_name, x: e.x, y: e.y })
@@ -46,61 +66,81 @@ const CreateMoim = () => {
     const handleCreateMoing = async (e) => {
         let checkDouble = false
 
-        if (moim.name == '' || moim.introduction_content.length < 10 || moim.category == '' || moim.region == '' || profile == null) {
-            console.log(moim)
-            alert('빈 항목을 작성해주세요')
-            return
+        if (moim.name.length === 0) {
+            alert('모임 이름을 입력해주세요.');
+            return;
         }
+
+        if (moim.name.length > NAME_MAX_LENGTH) {
+            alert(`모임 이름 글자수를 초과하였습니다. (현재: ${nameCharCount}자)`);
+            return;
+        }
+
+        if (moim.introduction_content.length < INTRO_MIN_LENGTH) {
+            alert(`모임 소개는 ${INTRO_MIN_LENGTH}자 이상 작성해주세요 (현재: ${introCharCount}자)`);
+            return;
+        }
+
+        if (moim.introduction_content.length > INTRO_MAX_LENGTH) {
+            alert(`모임 소개 글자수를 초과하였습니다. (현재: ${introCharCount}자)`);
+            return;
+        }
+
+        if (moim.category === '' || moim.region === '' || profile === null) {
+            console.log(moim);
+            alert('모든 항목을 작성해주세요');
+            return;
+        }
+
         if (user == null) {
             alert('로그인 정보 없음, 다시 로그인하세요')
             nav('/', { replace: true })
             return
         }
-        const res = await getMoim('moing.us-' + moim.name, moim.category);
-        if (res.statusCode === 200) {
+        const res = await checkMoimName('moing.us-' + moim.name);
+        if (res.statusCode !== 200) {
             setNameError('이미 사용 중인 모임 이름입니다.');
             return;
         } else {
             setNameError('');
         }
-        convertUrlToFile(profile).then(file => {
-            getPresignedURL_put(file.name, file.type).then(data => {
-                const temp = JSON.parse(data)
-                const fileUrl = temp['file_url']
-                console.log('file url : ', fileUrl)
-                setMoim((prevMoim) => {
-                    const updateMoim = { ...prevMoim, snapshot: fileUrl, owner_id: user.userId }
-                    console.log(updateMoim)
-                    if (!checkDouble) {
-                        checkDouble = true
-                        console.log("Request S3 Start !! ")
-                        putUploadMoimImageByPresignedUrl(temp['upload_url'], file).then(() => {
-                            postCreateMoing(updateMoim).then(data => {
-                                if (data.statusCode !== 200) {
-                                    alert('모임 생성 실패')
-                                    console.log(data)
-                                    return
-                                }
-                                console.log(data)
-                                alert('모임 생성 완료!')
-                                nav('/', { replace: true })
-                            }).catch(e => {
-                                console.error('Failed Create Moim !! ', e)
-                            })
-                        }).catch(e => {
-                            console.error('Failed Insert S3 From Presigned URL !! ', e)
-                        })
-                    }
-                    return updateMoim
-                })
+        try {
+            const file = await convertUrlToFile(profile);
+            const data = await getPresignedURL_put(file.name, file.type);
+            const temp = JSON.parse(data);
+            const fileUrl = temp.file_url;
+
+            console.log('file url : ', fileUrl);
+
+            const updateMoim = {
+                ...moim,
+                snapshot: fileUrl,
+                owner_id: user.userId,
+                owner_nickname: user.nickname
+            };
+
+            console.log(updateMoim);
+            console.log("Request S3 Start !!");
 
 
-            }).catch(e => {
-                console.error('Failed Get Presigned URL !! ', e)
-            })
-        }).catch(e => {
-            console.error('error in convert webpack to file : ', e)
-        })
+            const postResult = await postCreateMoing(updateMoim);
+            if (postResult.statusCode !== 200) {
+                alert('모임 생성 실패');
+                console.log(postResult);
+                return;
+            }
+
+            console.log(postResult);
+            await putUploadMoimImageByPresignedUrl(temp.upload_url, file);
+
+            alert('모임 생성 완료!');
+
+            nav('/', { replace: true });
+
+        } catch (e) {
+            console.error('모임 생성 중 오류 발생: ', e);
+            alert('모임 생성 중 오류가 발생했습니다.');
+        }
 
 
     }
@@ -120,20 +160,25 @@ const CreateMoim = () => {
                 <div className="mb-6">
                     <h2 className="text-left text-xl font-semibold text-gray-500 mb-4">모임 생성</h2>
 
-                    <input
-                        name='name'
-                        className={`text-2xl font-bold w-full border-b focus:outline-none
-                            ${nameError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
-                        value={moim.name}
-                        placeholder='모임 이름 입력'
-                        onChange={(e) => {
-                            handleUpdateMoim(e);
-                            setNameError(''); // 입력 중에는 에러 초기화
-                        }}
-                        autoFocus
-                    />
-                    {nameError && <p className="text-sm text-red-500 mt-2">{nameError}</p>}
-
+                    <div className="relative">
+                        <input
+                            name='name'
+                            className={`text-2xl font-bold w-full border-b focus:outline-none
+                                ${nameError || isNameExceeded ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                            value={moim.name}
+                            placeholder='모임 이름 입력'
+                            onChange={(e) => {
+                                handleUpdateMoim(e);
+                                setNameError(''); // 입력 중에는 에러 초기화
+                            }}
+                            maxLength={NAME_MAX_LENGTH + 10} // 완전히 제한하지는 않지만 사용자에게 힌트 제공
+                            autoFocus
+                        />
+                        <div className={`flex justify-end text-xs mt-1 ${isNameExceeded ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
+                            {nameCharCount}/{NAME_MAX_LENGTH}
+                        </div>
+                        {nameError && <p className="text-sm text-red-500 mt-1">{nameError}</p>}
+                    </div>
                 </div>
 
                 {/* 이미지 선택 */}
@@ -168,13 +213,43 @@ const CreateMoim = () => {
                         </div>
                     </div>
                 </div>
+                {/* 한줄 설명 */}
+                <div className="relative mb-6">
+                    <input
+                        name='short_description'
+                        className="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 border-gray-300"
+                        placeholder="모임을 한 줄로 소개해주세요"
+                        onChange={handleUpdateMoim}
+                        value={moim.short_description || ''}
+                        maxLength={30}
+                    />
+                    <div className="flex justify-end text-xs mt-1 text-gray-500">
+                        {(moim.short_description?.length || 0)}/30
+                    </div>
+                </div>
+
+
                 {/* 설명 */}
-                <textarea
-                    name='introduction_content'
-                    className="w-full p-4 border border-gray-300 rounded-xl mb-6 resize-none min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    placeholder="함께 하고 싶은 모임 활동을 자세히 소개해주세요 (10자 이상)"
-                    onChange={handleUpdateMoim}
-                />
+                <div className="relative mb-6">
+                    <textarea
+                        name='introduction_content'
+                        className={`w-full p-4 border rounded-xl resize-none min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-200
+                            ${isIntroExceeded ? 'border-red-500' : isIntroTooShort ? 'border-yellow-500' : 'border-gray-300'}`}
+                        placeholder="함께 하고 싶은 모임 활동을 자세히 소개해주세요 (10자 이상)"
+                        onChange={handleUpdateMoim}
+                        value={moim.introduction_content}
+                        maxLength={INTRO_MAX_LENGTH + 10} // 완전히 제한하지는 않지만 사용자에게 힌트 제공
+                    />
+                    <div className={`flex justify-end text-xs mt-1 
+                        ${isIntroExceeded ? 'text-red-500 font-medium' :
+                            isIntroTooShort && introCharCount > 0 ? 'text-yellow-600 font-medium' :
+                                'text-gray-500'}`}>
+                        {introCharCount}/{INTRO_MAX_LENGTH}
+                        {isIntroTooShort && introCharCount > 0 && (
+                            <span className="ml-2">최소 {INTRO_MIN_LENGTH}자 필요</span>
+                        )}
+                    </div>
+                </div>
 
                 {/* 주제 선택 */}
                 <div className="mb-10">

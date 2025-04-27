@@ -39,12 +39,6 @@ const GroupView = () => {
         navigate(`/moim/moimid?moimid=${encodeURIComponent(gathering.id)}&category=${encodeURIComponent(gathering.category)}`);
     };
 
-    //사용자 근처 모임리스트, 내 위치 받아오기
-    const handleNearbyMeetupsUpdate = (groupList, dong) => {
-        setNearbyMeetups(groupList);
-        setDongName(dong);
-    };
-
     //검색상태 체크
     useEffect(() => {
         if (!isSearching) getGroup();
@@ -80,8 +74,6 @@ const GroupView = () => {
 
     return (
         <>
-        <UserLocation onNearbyMeetupsUpdate={handleNearbyMeetupsUpdate} />
-
         {/* 로그인한 경우에만 MyGroupView 표시 */}
         {user && <MyGroupView />}
 
@@ -102,17 +94,34 @@ const GroupView = () => {
             {/* ✅ 검색 중이면 검색 결과만 보여줌 */}
             {isSearching ? (
                 <div className="search-results-container">
-                    <h2>“{keyword}” 검색 결과</h2>
+                    <h2>"{keyword}" 검색 결과</h2>
                     <button onClick={handleClickBack} className="back-button">돌아가기</button>
                     <div className="gathering-list">
                         {searchResult.length > 0 ? (
                             searchResult.map((gathering) => (
                                 <div key={gathering.id} className="gathering-box" onClick={() => handleClick(gathering)} style={{ cursor: 'pointer' }}>
                                     <img src={gathering.file_url} alt={`${gathering.name} 대표 이미지`} className="gathering-image" />
-                                    <h5>{gathering.name}</h5>
-                                    <p>카테고리: {gathering.category}</p>
-                                    <p>지역: {gathering.region}</p>
-                                    <p>멤버 수: {gathering.member_count}</p>
+                                    <div className="gathering-info">
+                                        <h5 className="gathering-name">{gathering.name}</h5>
+                                        <div className="gathering-detail">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                                            </svg>
+                                            <span>{gathering.category}</span>
+                                        </div>
+                                        <div className="gathering-detail">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                            </svg>
+                                            <span>{gathering.region}</span>
+                                        </div>
+                                        <div className="gathering-detail">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                                            </svg>
+                                            <span>{gathering.member_count}명</span>
+                                        </div>
+                                    </div>
                                 </div>
                             ))
                         ) : (
@@ -123,32 +132,33 @@ const GroupView = () => {
             ) : (
                 <>        
                     {/* 위치기반 모임 / 전체 모임 */}
-                    <div className="text-center" style={{ marginTop: '10px' }}>
+                    <div className="location-filter">
+                    <UserLocation onNearbyMeetupsUpdate={(groupList, dong) => {
+                        setNearbyMeetups(groupList);
+                        setDongName(dong);
+                    }} />
+                    
+                    {dongName && (
                 <button 
                     onClick={() => setShowAll(false)}
-                    style={{
-                        backgroundColor: !showAll ? '#add8e6' : '#f0f0f0',
-                        padding: '6px 10px',
-                        marginRight: '8px',
-                        borderRadius: '5px',
-                        fontSize: '14px',
-                        border: '1px solid #ccc',
-                        cursor: 'pointer',
-                    }}
+                    className={`location-button ${!showAll ? 'active' : ''}`}
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
                     "{dongName}" 근처 모임
                 </button>
+                    )}
                 <button 
                     onClick={() => setShowAll(true)}
-                    style={{
-                        backgroundColor: showAll ? '#add8e6' : '#f0f0f0',
-                        padding: '6px 10px',
-                        borderRadius: '5px',
-                        fontSize: '14px',
-                        border: '1px solid #ccc',
-                        cursor: 'pointer',
-                    }}
+                    className={`location-button ${showAll ? 'active' : ''}`}
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
                     전체 모임
                 </button>
             </div>
@@ -160,16 +170,7 @@ const GroupView = () => {
                 <button
                 key={cate || '전체보기'}
                 onClick={() => setCategory(cate)}
-                className="category-button"
-                style={{
-                  backgroundColor: category === cate ? '#add8e6' : '#f0f0f0', // 선택된 버튼은 연한 파랑, 나머지는 회색
-                  color: 'black', // 글자 색은 항상 검정
-                  border: '1px solid #ccc',
-                  padding: '8px 12px',
-                  marginRight: '8px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                }}
+                className={`category-button ${category === cate ? 'active' : ''}`}
                 >
                 {cate || '전체보기'}
                 </button>
@@ -190,12 +191,28 @@ const GroupView = () => {
                             src={gathering.file_url}
                             alt={`${gathering.name} 대표 이미지`}
                             className="gathering-image"
-                            
                         />
-                        <h5>{gathering.name}</h5>
-                        <p>카테고리: {gathering.category}</p>
-                        <p>지역: {gathering.region}</p>
-                        <p>멤버 수: {gathering.member_count}</p>
+                        <div className="gathering-info">
+                            <h5 className="gathering-name">{gathering.name}</h5>
+                            <div className="gathering-detail">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                                </svg>
+                                <span>{gathering.category}</span>
+                            </div>
+                            <div className="gathering-detail">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                </svg>
+                                <span>{gathering.region}</span>
+                            </div>
+                            <div className="gathering-detail">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                                </svg>
+                                <span>{gathering.member_count}명</span>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>

@@ -1,7 +1,10 @@
-import axios from "axios"
+import axios from "../utils/axiosConfig"
 
 const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev'
 const MOING_API_URL = '/moing/detail'
+const MOING_CHECK_NAME_URI = '/check'
+const MOING_INTRODUCTION_URI = '/introduction'
+const MOING_INTRODUCTION_IMAGES_URI = '/introduction/images'
 const MOING_JOIN_URI = '/join'
 const MOING_POST_URI = '/post'
 const MOING_EXIT_URI = '/exit'
@@ -28,10 +31,17 @@ export const getPresignedURL_put = async (name, type) => {
     })).data.body;
 }
 
-export const getScheduledPostByMoim = async (moim_id)=>{
-    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOIMG_GET_SCHEDULED_URI}`, {params: {'moim_id' : moim_id}})).data
+export const getScheduledPostByMoim = async (moim_id) => {
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOIMG_GET_SCHEDULED_URI}`, { params: { 'moim_id': moim_id } })).data
 }
 
+export const getOnceRecentByScheduled = async (moim_id) => {
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_INTRODUCTION_URI}`, { params: { 'moim_id': moim_id } })).data
+}
+
+export const getSomeImagesByMoim = async (moim_id) => {
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL + MOING_INTRODUCTION_IMAGES_URI}`, { params: { 'moim_id': moim_id } })).data
+}
 
 export const getPresignedURL_PostPut = async (urls) => {
     return (await axios.post(`${PREFIX_URL + MOING_POST_PRESIGN_URL_POST}`, urls, {
@@ -40,10 +50,10 @@ export const getPresignedURL_PostPut = async (urls) => {
         },
     }));
 }
-export const putExitMoim = async (moimid, moimcategory, userid)=>{
+export const putExitMoim = async (moimid, moimcategory, userid) => {
     return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_EXIT_URI}`
-            , { moimid: moimid, moimcategory: moimcategory, userid: userid },
-            { headers: { 'Content-Type': 'application/json' } })).data;
+        , { moimid: moimid, moimcategory: moimcategory, userid: userid },
+        { headers: { 'Content-Type': 'application/json' } })).data;
 }
 
 export const getAllPostImages = async (moim_id, bucketName) => {
@@ -75,6 +85,11 @@ export const getMoimImageByPresignedUrl = async (url) => {
 export const getMoim = async (id, category) => {
     return (await axios.get(`${PREFIX_URL + MOING_API_URL}`, { params: { 'id': id, 'category': category } })).data;
 }
+
+export const checkMoimName = async(id)=>{
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL+MOING_CHECK_NAME_URI}`, { params: { 'moim_id': id } })).data;
+}
+
 export const putJoinMoim = async (moimId, moimCategory, userId) => {
     return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}`,
         { moimid: moimId, moimcategory: moimCategory, userid: userId },
@@ -94,6 +109,17 @@ export const postCreateMoing = async (form) => {
     const headers = { 'Content-Type': 'application/json' };
     return (await axios.post(`${PREFIX_URL + MOING_API_URL}`, form, { headers })).data;
 }
+export const putUpdateMoing = async (form) => {
+    const headers = { 'Content-Type': 'application/json' };
+    try {
+        const response = await axios.put(`${PREFIX_URL + MOING_API_URL}`, form, { headers });
+        return response.data;
+    } catch (error) {
+        console.error("API 요청 오류:", error);
+        throw error;
+    }
+}
+
 
 
 export const postMoimPost = async (form) => {
@@ -116,21 +142,21 @@ export const updateMoimPost = async (form) => {
     return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_POST_URI}`, form, { headers })).data
 }
 
-export const getInvitation = async (moimid, category)=>{
+export const getInvitation = async (moimid, category) => {
     console.log("category:", category)
-    const response = await axios.get(`${PREFIX_URL+MOING_API_URL}/invitation`, {params:{'moimid': moimid,'category': category}}) 
-    
+    const response = await axios.get(`${PREFIX_URL + MOING_API_URL}/invitation`, { params: { 'moimid': moimid, 'category': category } })
+
     console.log('response:', response)
     return response.data.body;
 }
 
-export const postSendEmail = async (moimid, category, email, nickname)=>{
+export const postSendEmail = async (moimid, category, email, nickname) => {
     const response = await axios.post(`${PREFIX_URL + MOING_API_URL}/invitation`, {
         moimid: moimid,
         category: category,
         email: email,
         nickname: nickname
-      }, {
+    }, {
         headers: {
             'Content-Type': 'application/json',
         }
@@ -178,12 +204,13 @@ export const getPendingMembers = async (moimId) => {
     console.log("res.data : ", res.data);
     console.log("res.data.pendingMembers : ", res.data.pendingMembers);
     return res.data;
-  };
+};
 
-export const postApplyMoim = async (userId, moimId) => {
+export const postApplyMoim = async (userId, moimId, category) => {
     return await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}/apply`, {
         userId,
         moimId,
+        category
     }, {
         headers: {
             'Content-Type': 'application/json',
@@ -193,13 +220,12 @@ export const postApplyMoim = async (userId, moimId) => {
 
 export const approveMember = async (userId, moimId, category) => {
     return await axios.put(`${PREFIX_URL + MOING_API_URL}/approve-member`, {
-      userId,
-      moimId,
-      category
+        userId,
+        moimId,
+        category
     }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
+        headers: {
+            'Content-Type': 'application/json'
+        }
     });
-  };
-  
+};

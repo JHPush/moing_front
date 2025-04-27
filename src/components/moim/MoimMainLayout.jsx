@@ -15,7 +15,7 @@ import MemberList from "./component/moim/MemberList"
 
 
 
-const MoimMainLayout = ({ moim, user }) => {
+const MoimMainLayout = ({ moim, user,moimRefresh }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const [isOpenPost, setIsOpenPost] = useState(false)
@@ -26,70 +26,20 @@ const MoimMainLayout = ({ moim, user }) => {
     const [pageKey, setPageKey] = useState(null)
     const [postImgRes, setPostImgRes] = useState([])
     const [showChatPopup, setShowChatPopup] = useState(false);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
 
     const id = searchParams.get('moimid');
 
-    const getMoimPosts = async (id, limit = 5, key = null) => {
-        if (!id) return;
-
-        try {
-            // 게시글과 이미지 병렬 요청
-            const [postResRaw, imageResRaw] = await Promise.all([
-                postPagePostByMoimId(id, limit, key),
-                postImgRes.length === 0
-                    ? getAllPostImages(id, 'moim-post-images')
-                    : Promise.resolve(JSON.stringify(postImgRes))
-            ]);
-            const postRes = JSON.parse(postResRaw);
-            setPageKey(postRes.last_evaluated_key)
-
-            const images = postImgRes.length === 0 ? JSON.parse(imageResRaw) : postImgRes;
-
-            setPostImgRes(images);
-
-
-            // 게시글에 이미지 매핑
-            const newPosts = postRes.posts.map(post => {
-                const matched = images.filter(img => img.post_id === post.id);
-                return {
-                    ...post,
-                    files: matched.length > 0 ? matched[0].files : []
-                };
-            });
-
-            setPosts(prevPosts => {
-                // 중복된 게시글 처리
-                const uniqueNewPosts = newPosts.filter(newPost =>
-                    !prevPosts.some(prevPost => prevPost.id === newPost.id)
-                );
-
-                return [...prevPosts, ...uniqueNewPosts];
-            });
-        } catch (error) {
-            console.error("오류 발생:", error);
-        }
-    };
-
-
-    const handleReload = () => {
-        setReloadTrigger(prev => !prev);
-    };
+    useEffect(() => {
+        console.log('최초 호출')
+        getMoimPosts(id, 1, pageKey);
+    }, [id]);
 
     useEffect(() => {
-        if (id === null) return
+        console.log('pagekey', pageKey)
+        if (id === null || pageKey === null) return
         getMoimPosts(id, 5, pageKey);
-    }, [id, reloadTrigger]);
-
-    const handleOnExitMoim = () => {
-        if (!window.confirm('정말 탈퇴하시겠습니까?'))
-            return
-        putExitMoim(moim.id, moim.category, user.userId).then(d => {
-            console.log(d)
-            alert('모임을 탈퇴했습니다')
-        }).catch(e => {
-            console.log('error', e)
-        })
-    }
+    }, [reloadTrigger]);
 
     useEffect(() => {
         if (location.state?.activeTab === "postDetail" && location.state?.postId) {
@@ -102,7 +52,98 @@ const MoimMainLayout = ({ moim, user }) => {
         }
     }, [location.state, posts]);
 
+    const refreshGallery = async () => {
+        if (!id) return;
+        console.log('이미지 강제 업데이트~!');
+    
+        try {
+            const imageResRaw = await getAllPostImages(id, 'moim-post-images');
+            const images = JSON.parse(imageResRaw);
+            setPostImgRes(images);
+    
+            // 여기서 setState만 하지 말고, 직접 리턴!
+            return images;
+        } catch (error) {
+            console.error("이미지 로딩 오류:", error);
+        } finally {
+            setImagesLoaded(true); // 얘는 그냥 표시만
+        }
+    };
 
+    const handleFinishPostWriteOrUpdate = async () => {
+        console.log('글쓰기 혹은 업데이트 종료')
+        setImagesLoaded(false);
+        setPosts([]);
+        setPageKey(null);
+        setIsOpenPost(false);
+    
+        const images = await refreshGallery(); 
+        getMoimPosts(id, 1, null, images);
+    }
+    
+
+
+    const getMoimPosts = async (id, limit = 5, key = null, externalImages = null) => {
+        if (!id) return;
+        console.log('포스트 요청~!')
+
+        try {
+            const postResRaw = await postPagePostByMoimId(id, limit, key);
+            const postRes = JSON.parse(postResRaw);
+            setPageKey(postRes.last_evaluated_key);
+
+            let images = externalImages || postImgRes || [];
+            if (!images.length) {
+                console.log('내부적으로 이미지 다시 로드');
+                const imageResRaw = await getAllPostImages(id, 'moim-post-images');
+                images = JSON.parse(imageResRaw);
+                setPostImgRes(images);
+            }
+
+            const newPosts = postRes.posts.map(post => {
+                const matched = images.filter(img => img.post_id === post.id);
+                return {
+                    ...post,
+                    files: matched.length > 0 ? matched[0].files : []
+                };
+            });
+
+            setPosts(prevPosts => {
+                const uniqueNewPosts = newPosts.filter(newPost =>
+                    !prevPosts.some(prevPost => prevPost.id === newPost.id)
+                );
+
+                return [...prevPosts, ...uniqueNewPosts];
+            });
+        } catch (error) {
+            console.error("오류 발생:", error);
+        }
+    };
+
+    const handleReload = () => {
+        setReloadTrigger(prev => !prev);
+    };
+
+
+    const handleOnExitMoim = () => {
+        if (!window.confirm('정말 탈퇴하시겠습니까?'))
+            return
+        putExitMoim(moim.id, moim.category, user.userId).then(d => {
+            console.log(d)
+            alert('모임을 탈퇴했습니다')
+        }).catch(e => {
+            console.log('error', e)
+        })
+    }
+
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+
+        // 갤러리 탭으로 전환할 때 이미지가 아직 로드되지 않았으면 로드
+        if (tab === "photo" && !imagesLoaded) {
+            refreshGallery();
+        }
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen py-6 px-4 flex justify-center font-[Pretendard]">
@@ -111,22 +152,22 @@ const MoimMainLayout = ({ moim, user }) => {
                 <nav className="flex justify-center space-x-6 text-sm font-medium text-gray-600 border-b pb-3 mb-6">
                     <span
                         className={`${activeTab === "home" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                        onClick={() => setActiveTab("home")} >
+                        onClick={() => handleTabChange("home")}>
                         홈
                     </span>
                     <span
                         className={`${activeTab === "photo" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                        onClick={() => setActiveTab("photo")} >
+                        onClick={() => handleTabChange("photo")}>
                         사진첩
                     </span>
                     <span
                         className={`${activeTab === "schedule" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                        onClick={() => setActiveTab("schedule")}>
+                        onClick={() => handleTabChange("schedule")}>
                         일정
                     </span>
                     <span
                         className={`${activeTab === "member" ? "text-black border-b-2 border-black" : "hover:text-black"} pb-1 cursor-pointer`}
-                        onClick={() => setActiveTab("member")}>
+                        onClick={() => handleTabChange("member")}>
                         멤버
                     </span>
                 </nav>
@@ -134,14 +175,11 @@ const MoimMainLayout = ({ moim, user }) => {
                 <div className="grid grid-cols-4 gap-4">
                     {/* Sidebar */}
                     <aside className="col-span-1 space-y-4">
-                        <ProfileCard moim={moim} user={user} />
+                        <ProfileCard moim={moim} user={user} moimRefresh={moimRefresh} />
                         <div className="text-sm space-y-2 pl-2">
                             {activeTab === 'home' ?
                                 <button className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md active:bg-gray-700 transition duration-150" onClick={() => setIsOpenPost(!isOpenPost)}>글쓰기</button>
                                 : <></>}
-
-
-
                             <button
                                 className="w-full mt-3 py-1.5 text-sm bg-black text-white rounded-md"
                                 onClick={() => setShowChatPopup(true)}
@@ -166,18 +204,27 @@ const MoimMainLayout = ({ moim, user }) => {
                                 </svg>
                                 <span>멤버초대하기</span>
                             </div>
-                            <div className="text-gray-500 cursor-pointer hover:underline" onClick={handleOnExitMoim}>모임 탈퇴</div>
+                            {user.userId === moim.owner_id? <></>: <div className="text-gray-500 cursor-pointer hover:underline" onClick={handleOnExitMoim}>모임 탈퇴</div>}
 
                         </div>
                     </aside>
                     <div className="col-span-2 min-h-[500px] max-h-[500px]">
                         {activeTab === "home" && (
-                            <MoimPostComponent isOpenPost={isOpenPost} moim={moim} user={user} posts={posts} reloadTrigger={handleReload} onSelectPost={(post) => {
+                            <MoimPostComponent isOpenPost={isOpenPost} moim={moim} user={user} posts={posts} reloadTrigger={handleReload} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate} onSelectPost={(post) => {
                                 setSelectedPost(post);
                                 setActiveTab("postDetail");
                             }} />
                         )}
-                        {activeTab === "photo" && <PhotoGallery posts={posts} photos={postImgRes} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
+                        {activeTab === "photo" &&
+                            <div>
+                                <button
+                                    className="mb-4 px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+                                    onClick={refreshGallery} >
+                                    사진 새로고침
+                                </button>
+                                <PhotoGallery photos={postImgRes} />
+                            </div>
+                        }
                         {activeTab === "schedule" && <MoimPostCalanderComponent moim={moim} posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {activeTab === "member" && <MemberList moim={moim} user={user} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}

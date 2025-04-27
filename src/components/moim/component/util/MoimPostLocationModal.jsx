@@ -44,11 +44,13 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
     // 지도 클릭
     kakao.maps.event.addListener(map, "click", function (mouseEvent) {
       const latlng = mouseEvent.latLng;
+
       geocoder.coord2Address(latlng.getLng(), latlng.getLat(), (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
           const address = result[0].address.address_name;
           setSelectedAddress(address);
           setCoord({x: String(latlng.getLng()), y : String(latlng.getLat())})
+          console.log(latlng)
           marker.setPosition(latlng);
           marker.setMap(map);
         }
@@ -63,11 +65,15 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
       ps.keywordSearch(searchKeyword, function (data, status) {
         if (status === kakao.maps.services.Status.OK) {
           const place = data[0];
+          console.log('ps : ', place)
           const loc = new kakao.maps.LatLng(place.y, place.x);
+          console.log('loc : ', loc)
           map.setCenter(loc);
           marker.setPosition(loc);
           marker.setMap(map);
           setSelectedAddress(place.address_name);
+          setCoord({x: String(place.x), y : String(place.y)})
+
         }
       });
     };

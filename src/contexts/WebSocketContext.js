@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useRef } from 'react';
+import { useSelector } from 'react-redux';
 
 // WebSocket 연결 상태를 관리할 context
 const WebSocketContext = createContext();
@@ -6,16 +7,20 @@ const WebSocketContext = createContext();
 // WebSocket 제공자 컴포넌트
 export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const [userId, setUserId] = useState(null);
   const reconnectInterval = useRef(null);
   const pingInterval = useRef(null);
-  
-  const connectWebSocket = (userId) => {
-    const url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${userId}`;
+  console.log("socket:", socket)
+
+  const user = useSelector(state => state.user.user)
+
+  const connectWebSocket = (loginId) => {
+    const url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${loginId}`;
     const ws = new WebSocket(url);
+    console.log(loginId)
 
     ws.onopen = () => {
       console.log('✅ WebSocket 연결 성공');
+  
       setSocket(ws);
 
       // 주기적인 ping 메시지
@@ -32,15 +37,17 @@ export const WebSocketProvider = ({ children }) => {
       clearInterval(pingInterval.current);
       setSocket(null);
 
-      // 자동 재연결 시도
-      // if (userId) {
-      //   console.log(userId)
-      //   console.log("재연결 시도중")
-      //   reconnectInterval.current = setTimeout(() => {
-      //     console.log('🔄 WebSocket 재연결 시도');
-      //     connectWebSocket(userId);
-      //   }, 3000); // 3초 후 재연결
-      // }
+      console.log("재연결userId:" , user);
+
+      //자동 재연결 시도
+      if (user) {
+        console.log("Redux 사용자",user)
+        console.log("재연결 시도중", user.userId)
+        reconnectInterval.current = setTimeout(() => {
+          console.log('🔄 WebSocket 재연결 시도');
+          connectWebSocket(user.userId);
+        }, 3000); // 3초 후 재연결
+      }
     };
 
     ws.onerror = (error) => {
@@ -50,9 +57,9 @@ export const WebSocketProvider = ({ children }) => {
     return ws;
   };
 
-  const connectOnLogin = (userId) => {
-    setUserId(userId);
-    connectWebSocket(userId);
+  const connectOnLogin = (loginId) => {
+    console.log(loginId)
+    connectWebSocket(loginId);
 
   };
   
@@ -63,7 +70,7 @@ export const WebSocketProvider = ({ children }) => {
     if (socket) {
       socket.close();
       setSocket(null);
-      setUserId(null)
+    
     }
     clearInterval(pingInterval.current);
     clearTimeout(reconnectInterval.current);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const PhotoGallery = ({ posts, photos, selectedPost }) => {
+const PhotoGallery = ({photos }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   let isFileIn = false
