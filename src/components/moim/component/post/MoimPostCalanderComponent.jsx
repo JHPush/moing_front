@@ -21,7 +21,7 @@ const MyCustomToolbar = ({ label, onNavigate }) => (
     </div>
 );
 
-const MoimPostCalendarComponent = ({ moim ,selectedPost }) => {
+const MoimPostCalendarComponent = ({ moim, selectedPost }) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [events, setEvents] = useState([]);
@@ -48,25 +48,25 @@ const MoimPostCalendarComponent = ({ moim ,selectedPost }) => {
         setEvents(eventList);
     }, [posts]);
 
-    const getPostsByScheduled = async ()=>{
-        if(!moim.id || moim.id === ''){
+    const getPostsByScheduled = async () => {
+        if (!moim.id || moim.id === '') {
             console.log('모임 아이디가 없는데?')
             return
         }
         console.log('스케줄 불러오는중...')
-        
+
         const res = await getScheduledPostByMoim(moim.id)
-        if(!res || res.statusCode != 200){
+        if (!res || res.statusCode != 200) {
             console.error('error', res)
             alert('게시글 불러오기가 실패하는데?')
         }
-        const temp =JSON.parse(res.body)
-        console.log('res is ', temp) 
+        const temp = JSON.parse(res.body)
+        console.log('res is ', temp)
         setPosts(temp)
     }
 
-    useEffect(()=>{
-        if(posts.length>0) return
+    useEffect(() => {
+        if (posts.length > 0) return
 
         getPostsByScheduled()
 
@@ -78,13 +78,13 @@ const MoimPostCalendarComponent = ({ moim ,selectedPost }) => {
 
         const clickedDate = slotInfo.start;
         setSelectedDate(clickedDate);
-    
+
         // 선택한 날짜의 이벤트 필터링
         const filteredEvents = events.filter(event => {
-            if(!event)return
+            if (!event) return
             return event.start.toDateString() === clickedDate.toDateString();
         });
-    
+
         setSelectedEvent(filteredEvents); // 상태 업데이트
     };
 
@@ -95,27 +95,27 @@ const MoimPostCalendarComponent = ({ moim ,selectedPost }) => {
 
     const highlightSelectedDay = (date) => {
         const isSameDate = selectedDate &&
-          date.getFullYear() === selectedDate.getFullYear() &&
-          date.getMonth() === selectedDate.getMonth() &&
-          date.getDate() === selectedDate.getDate();
-    
+            date.getFullYear() === selectedDate.getFullYear() &&
+            date.getMonth() === selectedDate.getMonth() &&
+            date.getDate() === selectedDate.getDate();
+
         if (isSameDate) {
-          return {
-            style: {
-              backgroundColor: '#D1FAE5', // 예: 연한 민트색
-              borderRadius: '10%',
-            },
-          };
+            return {
+                style: {
+                    backgroundColor: '#D1FAE5', // 예: 연한 민트색
+                    borderRadius: '10%',
+                },
+            };
         }
         return {};
-      };
+    };
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-xl rounded-2xl">
             <Calendar
                 localizer={localizer}
                 events={events}
-                style={{ height: '600px' }}
+                style={{ height: '550px' }}
                 components={{ toolbar: MyCustomToolbar }}
                 selectable
                 onSelectSlot={handleDateSelect}
@@ -126,26 +126,28 @@ const MoimPostCalendarComponent = ({ moim ,selectedPost }) => {
 
             {/* 선택한 날짜 또는 이벤트 표시 */}
             <div className="mt-6 p-4 bg-gray-100 rounded-lg shadow-lg">
-                {selectedDate && (
-                    <h2 className="text-xl font-semibold text-green-600">
-                        모임
+                {/* {selectedDate && (
+                    <h2 className="text-[20px] font-semibold text-blue-400">
+                        해당 날짜의 모임 정보
                     </h2>
-                )}
+                )} */}
 
-                {selectedEvent&& selectedEvent.length > 0 ? (
+                {selectedEvent && selectedEvent.length > 0 ? (
                     <ul className="mt-4 space-y-2">
                         {selectedEvent.map((event, index) => (
-                            <li key={index} className="p-3 bg-white rounded-lg shadow-md hover:bg-gray-200 transition cursor-pointer" onClick={()=>selectedPost?.(event.description)}>
-                                <h3 className="text-lg font-bold text-blue-600">{event.title}</h3>
-                                <p className="text-gray-700">{event.description.content}</p>
+                            <li key={index} className="p-3 bg-white rounded-lg shadow-md hover:bg-gray-200 transition cursor-pointer" onClick={() => selectedPost?.(event.description)}>
+                                <h3 className="text-md font-bold text-blue-600">{event.title}</h3>
+                                <p className="text-gray-500">{event.description.content}</p>
                                 <p className="text-sm text-gray-500">
-                                    {event.start.toLocaleTimeString()} - {event.end.toLocaleTimeString()}
+                                    {event.start.toLocaleTimeString()}
                                 </p>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-gray-500 text-center mt-4">해당 날짜에 모임이 없습니다.</p>
+                    <p className="text-xs text-gray-500 text-center mt-3">
+                        해당 날짜에 모임이 없습니다.
+                    </p>
                 )}
             </div>
         </div>

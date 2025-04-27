@@ -3,19 +3,16 @@ import BasicMenu from "../components/menus/BasicMenu";
 const BasicLayout = ({ children }) => {
   return (
     <>
-      {/* 기존 헤더 대신 BasicMenu */}
+      {/* 상단 네비게이션 */}
       <BasicMenu />
 
-      {/* 상단 여백 my-5 제거하고 일관된 디자인 유지 */}
-      <div className="bg-white py-10 w-full flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-      
-      <main 
-      className="md:w-4/5 lg:w-3/4 px-5 py-5">
+      {/* 메인 레이아웃 */}
+      <div className="flex justify-center bg-gray-50">
+        <main className="w-full justify-center max-w-6xl bg-white rounded-xl shadow-md p-8">
           {children}
-      </main>
-
-    </div>
-  </>
+        </main>
+      </div>
+    </>
   );
 };
 

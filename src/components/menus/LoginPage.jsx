@@ -9,7 +9,7 @@ import { useWebSocket } from '../../contexts/WebSocketContext';
 import { saveUserToCookies } from '../../utils/cookieUtils';
 import { setUser } from '../../store/userSlice';
 
-const LoginPage = () => {
+const LoginPage = ({handleOnLogin}) => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -66,6 +66,7 @@ const LoginPage = () => {
 
           //  WebSocket 연결
           connectOnLogin(userData.userId);    
+          handleOnLogin()
 
         } catch (error) {
           alert('사용자 정보를 가져오는 데 실패했습니다.');
