@@ -170,10 +170,11 @@ const NotifyComponent = ({socket}) => {
       }, 100);
       
       // APPROVE 타입인 경우 모임 페이지로 이동
-      if (msg.notification_type === "APPROVE") {
+      if (msg.notification_type === "APPROVE" || msg.notification_type === "APPLY") {
         navigate(`/moim/moimid?moimid=${gathering_id}&category=${category}`);
         return;
       }
+      
       
       // 기존 게시글 이동 로직
       navigate(`/moim/moimid?moimid=${gathering_id}&category=${category}`, {
@@ -239,6 +240,14 @@ const NotifyComponent = ({socket}) => {
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
           </div>
+        );
+      } else if (type === "APPLY") {
+        return (
+          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3 flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        </div>
         );
       } else if (postType === "Notice") {
         return (
@@ -335,7 +344,12 @@ const NotifyComponent = ({socket}) => {
                 if (msg.notification_type === "APPROVE") {
                   title = `${formattedMoimName} 모임 가입 승인`;
                   details = "모임 가입이 승인되었습니다.";
-                } else if (msg.post_type === "Notice") {
+                } 
+                  else if (msg.notification_type === "APPLY") {
+                  title = `${formattedMoimName} 모임 가입 신청`;
+                  details = "모임 가입 신청 요청이 있습니다.";
+                } 
+                  else if (msg.post_type === "Notice") {
                   title = `${formattedMoimName} 모임 새 공지`;
                   details = msg.content;
                 } else if (msg.post_type === "Scheduled") {
@@ -356,6 +370,13 @@ const NotifyComponent = ({socket}) => {
                   >
                     <div className="w-8 h-8 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
                       {msg.notification_type === "APPROVE" && (
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+                        {msg.notification_type === "APPLY" && (
                         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />

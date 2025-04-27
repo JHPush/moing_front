@@ -197,7 +197,7 @@ export const approveMember = async (userId, moimId, category) => {
       category
     }, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'applicatio`n/json'
       }
     });
   };

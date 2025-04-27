@@ -68,7 +68,7 @@ const ChatMessageBox = ({ gatheringId, memberId, onClose }) => {
       className="fixed max-w-xs bg-white rounded-lg shadow-xl flex flex-col z-50 overflow-hidden"
       style={{ 
         width: '320px', 
-        height: '480px',
+        height: '700px',
         right: position.right, 
         bottom: position.bottom,
         transition: isDragging ? 'none' : 'box-shadow 0.2s ease',

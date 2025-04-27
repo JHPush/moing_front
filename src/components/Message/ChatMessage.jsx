@@ -172,6 +172,7 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
         }
     }, [messages]);
 
+
     // 스크롤 맨 위에서 이전 메시지 로드
     const handleLoadMore = async () => {
         if (messages.length === 0 || !hasMoreMessages) return;
@@ -329,6 +330,7 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
         });
     };
 
+
     return(
         <div className="flex justify-center items-center w-full bg-gray-100">
             <div className="w-full max-w-2xl bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-[80vh] my-4">
@@ -338,7 +340,7 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
                         {gatheringId?.substring(0, 1).toUpperCase() || "M"}
                     </div>
                     <div className="ml-3">
-                        <h1 className="text-lg font-semibold">{gatheringId?.replace('moing.us-', '') || '채팅방'}</h1>
+                         <h1 className="text-lg font-semibold">{gatheringId?.replace('moing.us-', '') || '채팅방'}</h1>
                         <p className="text-xxs text-blue-100">{messages.length > 0 ? `${messages.length}개의 메시지` : '메시지가 없습니다'}</p>
                     </div>
                 </div>
