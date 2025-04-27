@@ -204,10 +204,11 @@ export const getPendingMembers = async (moimId) => {
     return res.data;
 };
 
-export const postApplyMoim = async (userId, moimId) => {
+export const postApplyMoim = async (userId, moimId, category) => {
     return await axios.post(`${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}/apply`, {
         userId,
         moimId,
+        category
     }, {
         headers: {
             'Content-Type': 'application/json',

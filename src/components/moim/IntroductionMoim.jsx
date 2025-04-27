@@ -25,7 +25,7 @@ const IntroductionMoim = ({ moim, user }) => {
             return;
         }
 
-        postApplyMoim(user.userId, moim.id)
+        postApplyMoim(user.userId, moim.id, moim.category)
             .then(() => {
                 alert('모임 가입 신청이 완료되었습니다!');
                 nav(`/introduct-moim/moimid?moimid=${moim.id}&category=${moim.category}`);
