@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMoim, getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
+import { checkMoimName, getMoim, getPresignedURL_put, postCreateMoing, putUploadMoimImageByPresignedUrl } from '../../api/moimAPI';
 import SelectLocation from './MoimSelectLocation';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -97,8 +97,8 @@ const CreateMoim = () => {
             nav('/', { replace: true })
             return
         }
-        const res = await getMoim('moing.us-' + moim.name, moim.category);
-        if (res.statusCode === 200) {
+        const res = await checkMoimName('moing.us-' + moim.name);
+        if (res.statusCode !== 200) {
             setNameError('이미 사용 중인 모임 이름입니다.');
             return;
         } else {

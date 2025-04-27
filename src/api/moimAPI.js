@@ -2,6 +2,7 @@ import axios from "../utils/axiosConfig"
 
 const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev'
 const MOING_API_URL = '/moing/detail'
+const MOING_CHECK_NAME_URI = '/check'
 const MOING_INTRODUCTION_URI = '/introduction'
 const MOING_INTRODUCTION_IMAGES_URI = '/introduction/images'
 const MOING_JOIN_URI = '/join'
@@ -85,6 +86,9 @@ export const getMoim = async (id, category) => {
     return (await axios.get(`${PREFIX_URL + MOING_API_URL}`, { params: { 'id': id, 'category': category } })).data;
 }
 
+export const checkMoimName = async(id)=>{
+    return (await axios.get(`${PREFIX_URL + MOING_API_URL+MOING_CHECK_NAME_URI}`, { params: { 'moim_id': id } })).data;
+}
 
 export const putJoinMoim = async (moimId, moimCategory, userId) => {
     return (await axios.put(`${PREFIX_URL + MOING_API_URL + MOING_JOIN_URI}`,
