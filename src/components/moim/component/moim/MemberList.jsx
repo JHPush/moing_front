@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMoimMembers, getPendingMembers, approveMember } from "../../../../api/moimAPI";
 
-const MemberList = ({ moim }) => {
+const MemberList = ({ moim, user }) => {
   const [members, setMembers] = useState([]);
   const [pendingMembers, setPendingMembers] = useState([]);
 
@@ -54,7 +54,7 @@ const MemberList = ({ moim }) => {
 
       <hr className="my-4" />
 
-      {pendingMembers.length > 0 && (
+      {user?.userId === moim.owner_id && pendingMembers.length > 0 && (
         <>
           <h2 className="text-lg font-bold text-orange-600">가입 신청자</h2>
           {pendingMembers.map(member => (

@@ -174,6 +174,8 @@ export const getMoimMembers = async (moimId) => {
 
 export const getPendingMembers = async (moimId) => {
     const res = await axios.get(`${PREFIX_URL + MOING_API_URL}/${moimId}/pending-members`);
+    console.log("res : ", res);
+    console.log("res.data : ", res.data);
     console.log("res.data.pendingMembers : ", res.data.pendingMembers);
     return res.data;
   };

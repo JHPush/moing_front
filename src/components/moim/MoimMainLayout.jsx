@@ -179,7 +179,7 @@ const MoimMainLayout = ({ moim, user }) => {
                         )}
                         {activeTab === "photo" && <PhotoGallery posts={posts} photos={postImgRes} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {activeTab === "schedule" && <MoimPostCalanderComponent moim={moim} posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
-                        {activeTab === "member" && <MemberList moim={moim} />}
+                        {activeTab === "member" && <MemberList moim={moim} user={user} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
                             <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} onBack={() => setActiveTab("home")} />

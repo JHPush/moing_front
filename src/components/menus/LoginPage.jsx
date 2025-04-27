@@ -63,7 +63,7 @@ const LoginPage = () => {
           connectOnLogin(userData.userId);
 
           alert('로그인 성공!');
-          navigate('/');      
+          navigate('/');
 
         } catch (error) {
           alert('사용자 정보를 가져오는 데 실패했습니다.');

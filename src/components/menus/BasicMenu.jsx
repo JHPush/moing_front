@@ -13,14 +13,14 @@ const BasicMenu = () => {
 
   const { socket, disconnectWebSocket } = useWebSocket(); // WebSocketContext에서 받아오기
 
-  const checkLogin = (e)=>{
+  const checkLogin = (e) => {
     console.log(e)
-    if(user) {
+    if (user) {
       nav(e.target.name)
       return;
     }
     alert('로그인을 진행해주세요')
-    nav('', {replace:true})
+    nav('', { replace: true })
   }
 
   const handleLogout = () => {
@@ -31,7 +31,7 @@ const BasicMenu = () => {
     removeCookie('refreshToken');
     localStorage.clear();
     dispatch(logoutUser());
-    nav("/", {replace:true})
+    nav("/", { replace: true })
   };
 
   return (
@@ -48,7 +48,9 @@ const BasicMenu = () => {
             <div className="space-x-4 text-white">
               {isAuthenticated ? (
                 <>
-                  <span>{user?.email}</span>
+                  <button onClick={() => nav('/profile')} className="hover:underline">
+                    {user?.email}
+                  </button>
                   <button onClick={handleLogout}>Logout</button>
                 </>
               ) : (
@@ -60,16 +62,16 @@ const BasicMenu = () => {
             </div>
           </li>
           <li className="pr-6 text-2xl">
-          <button name="/create-moim" onClick={checkLogin}>모임 생성</button> 
+            <button name="/create-moim" onClick={checkLogin}>모임 생성</button>
           </li>
           <li className="pr-6 text-2xl">
-          <button name="/moim/moimid?moimid=moing.us-파일생성%20테스트&category=영화" onClick={checkLogin}>임시 모임 조회</button> 
+            <button name="/moim/moimid?moimid=moing.us-파일생성%20테스트&category=영화" onClick={checkLogin}>임시 모임 조회</button>
           </li>
           {/* 알림 컴포넌트 */}
           {isAuthenticated && (
-          <li className="relative pr-6 text-2xl">
-        <NotifyComponent socket={socket}  />
-        </li>
+            <li className="relative pr-6 text-2xl">
+              <NotifyComponent socket={socket} />
+            </li>
           )}
         </ul>
       </div>

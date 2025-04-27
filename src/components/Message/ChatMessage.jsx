@@ -75,6 +75,7 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
         // };
 
         const sendMessage = () => {
+            console.log("start!!!");
             if (messageInput.trim() && socket && socket.readyState === WebSocket.OPEN) {
             const message = {
                 action: "chat",
