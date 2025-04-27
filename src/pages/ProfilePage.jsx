@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev';
+const PREFIX_URL = process.env.REACT_APP_PREFIX_URL;
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
@@ -19,7 +19,7 @@ const ProfilePage = () => {
 
   const fetchProfile = async () => {
     try {
-      const { data } = await axios.get(`${API_BASE}/users/profile`, {
+      const { data } = await axios.get(`${PREFIX_URL}/users/profile`, {
         headers: { Authorization: `Bearer ${idToken}` }
       });
       setProfile(data);
@@ -55,7 +55,7 @@ const ProfilePage = () => {
   };
 
   const updateProfile = async (updateData) => {
-    await axios.put(`${API_BASE}/users/profile`, updateData, {
+    await axios.put(`${PREFIX_URL}/users/profile`, updateData, {
       headers: { Authorization: `Bearer ${idToken}` }
     });
   };
@@ -65,7 +65,7 @@ const ProfilePage = () => {
     if (!file) return;
 
     try {
-      const { data: presignedData } = await axios.post(`${API_BASE}/users/presigned-url`, {
+      const { data: presignedData } = await axios.post(`${PREFIX_URL}/users/presigned-url`, {
         fileName: file.name,
         fileType: file.type
       }, {
@@ -93,7 +93,6 @@ const ProfilePage = () => {
     { label: "이름", field: "name", editable: true },
     { label: "전화번호", field: "phoneNumber", editable: true },
     { label: "성별", field: "gender", editable: true },
-    { label: "주소", field: "address", editable: true },
     { label: "생년월일", field: "birth", editable: true }
   ];
 

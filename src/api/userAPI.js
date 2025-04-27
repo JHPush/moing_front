@@ -1,10 +1,12 @@
 // src/api/userAPI.js
 import axios from 'axios';
 
+const PREFIX_URL = process.env.REACT_APP_PREFIX_URL
+
 export const getUserData = async (userSub, idToken) => {
   try {
     const response = await axios.get(
-      `https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/login`,
+      `${PREFIX_URL}/login`,
       {
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -23,7 +25,7 @@ export const getUserData = async (userSub, idToken) => {
 // userId로 유저 정보 가져오기
 export const getUserById = async (userId) => {
     try {
-      const response = await axios.get(`https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/users/${userId}`);
+      const response = await axios.get(`${PREFIX_URL}/users/${userId}`);
       console.log("response : ". response);
       return response.data; // 사용자 정보 반환
     } catch (error) {

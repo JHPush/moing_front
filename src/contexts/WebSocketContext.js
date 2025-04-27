@@ -62,8 +62,6 @@ export const WebSocketProvider = ({ children }) => {
     connectWebSocket(loginId);
 
   };
-  
-
 
   // WebSocket 연결 종료
   const disconnectWebSocket = () => {

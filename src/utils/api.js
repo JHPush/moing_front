@@ -1,6 +1,6 @@
 // src/utils/api.js
 export const postUserToLambda = async (data) => {
-    const response = await fetch("https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/signup", {
+    const response = await fetch(`${process.env.REACT_APP_PREFIX_URL}/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -12,7 +12,7 @@ export const postUserToLambda = async (data) => {
   };
   
   export const verifyEmailBySES = async (email) => {
-    const response = await fetch("https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/signup/verifyEmail", {
+    const response = await fetch(`${process.env.REACT_APP_PREFIX_URL}/signup/verifyEmail`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev/moing'
+const PREFIX_URL = process.env.REACT_APP_PREFIX_URL
 
 export const getNotify = async (userId)=>{
     const res = await axios.get(`${PREFIX_URL}/notify`, { params: { userId } });

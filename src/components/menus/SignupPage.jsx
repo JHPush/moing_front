@@ -21,7 +21,6 @@ const SignupPage = () => {
     gender: '',
     birth: '',
     phoneNumber: '',
-    address: '',
   });
 
   const handleChange = (e) => {
@@ -205,8 +204,6 @@ const SignupPage = () => {
           </div>
 
           <input name="phoneNumber" placeholder="전화번호( - 없이 숫자만 입력해주세요 )" onChange={handleChange} className="border p-2 w-full" />
-          <input name="address" placeholder="주소" onChange={handleChange} className="border p-2 w-full" />
-
           <button onClick={handleAdditionalSubmit} disabled={isLoading} className="bg-green-500 text-white px-4 py-2 rounded w-full">
             {isLoading ? '저장 중...' : '다음 (이메일 인증)'}
           </button>

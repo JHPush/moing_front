@@ -16,7 +16,6 @@ export const updateUserInfo = async(dispatch, userId, idToken, accessToken) => {
     email: userData.email,
     nickname: userData.nickname,
     name: userData.name,
-    address: userData.address,
     profileImageUrl: userData.profileImageUrl,
     birth: userData.birth,
     gatherings: userData.gatherings,

@@ -2,8 +2,9 @@
 import axios from 'axios';
 import { loadingController } from './loadingController';
 
+
 const instance = axios.create({
-    baseURL: 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev'
+    baseURL: process.env.REACT_APP_PREFIX_URL
 });
 
 instance.interceptors.request.use(

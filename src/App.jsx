@@ -18,7 +18,7 @@ const GlobalLoaderBridge = () => {
 
 function App() {
   const dispatch = useDispatch();
-
+  console.log("process.env.REACT_APP_PREFIX_URL : ", process.env.REACT_APP_PREFIX_URL);
   useEffect(() => {
     const savedUser = loadUserFromCookies();
     if (savedUser) {

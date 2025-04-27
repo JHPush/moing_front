@@ -1,6 +1,6 @@
 import axios from "../utils/axiosConfig"
 
-const PREFIX_URL = 'https://ardbyd7sf7.execute-api.ap-northeast-2.amazonaws.com/dev'
+const PREFIX_URL = process.env.REACT_APP_PREFIX_URL
 const MOING_API_URL = '/moing/detail'
 const MOING_CHECK_NAME_URI = '/check'
 const MOING_INTRODUCTION_URI = '/introduction'
