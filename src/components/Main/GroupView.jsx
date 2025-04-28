@@ -36,6 +36,10 @@ const GroupView = () => {
 
     //모임 클릭시 상세페이지로 이동
     const handleClick = (gathering) => {
+        if(!user || !user.userId){
+            alert('로그인을 해주세요')
+            return
+        }
         navigate(`/moim/moimid?moimid=${encodeURIComponent(gathering.id)}&category=${encodeURIComponent(gathering.category)}`);
     };
 
