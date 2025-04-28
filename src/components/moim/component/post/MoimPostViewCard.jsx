@@ -112,6 +112,7 @@ const MoimPostView = ({ post, user, onBack, reloadTrigger,handleFinishPostWriteO
                 return
             }
             reloadTrigger()
+            handleFinishPostWriteOrUpdate()
             alert('삭제 성공');
             onBack();
         }).catch(e => {

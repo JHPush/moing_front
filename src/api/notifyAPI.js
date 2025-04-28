@@ -19,14 +19,9 @@ export const changeIsRead = async (id, post_id) =>{
     return res;
 }
 
-// export const deleteNotify = async (gathering_id, userId, post_id)=>{
-//   const res = await axios.delete(`${PREFIX_URL}/notify`, { params: { gathering_id, userId, post_id} });
-//   return res;
-// }
-
 
 export const deleteNotify = async (gathering_id, userId, post_id) => {
-  const res = await axios.delete(`${PREFIX_URL}moing/notify`, {
+  const res = await axios.delete(`${PREFIX_URL}/moing/notify`, {
     data: { gathering_id, userId, post_id }, // ← 여기에 data로!
     headers: {
       'Content-Type': 'application/json',

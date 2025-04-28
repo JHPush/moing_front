@@ -334,7 +334,7 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
     return(
         <div className="flex justify-center items-center w-full bg-gray-100">
             <div className="w-full max-w-2xl bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-[80vh] my-4">
-                {/* 채팅방 헤더 */}
+                {/* 채팅방 헤더
                 <div className="bg-blue-600 text-white p-3 flex items-center shadow-md">
                     <div className="w-8 h-8 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-lg">
                         {gatheringId?.substring(0, 1).toUpperCase() || "M"}
@@ -343,7 +343,7 @@ const ChatMessage = ({ gatheringId: propGatheringId, memberId: propMemberId }) =
                          <h1 className="text-lg font-semibold">{gatheringId?.replace('moing.us-', '') || '채팅방'}</h1>
                         <p className="text-xxs text-blue-100">{messages.length > 0 ? `${messages.length}개의 메시지` : '메시지가 없습니다'}</p>
                     </div>
-                </div>
+                </div> */}
                 
                 {/* 메시지 목록 */}
                 <div 
