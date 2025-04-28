@@ -1,6 +1,5 @@
-// lib/loadingController.js
-let _start = () => {};
-let _stop = () => {};
+let _start = () => { };
+let _stop = () => { };
 
 export const loadingController = {
     start: () => _start(),

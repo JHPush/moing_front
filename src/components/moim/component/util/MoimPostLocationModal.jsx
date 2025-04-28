@@ -8,7 +8,7 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [coord, setCoord] = useState({x:'', y:''})
+  const [coord, setCoord] = useState({ x: '', y: '' })
 
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
@@ -23,10 +23,6 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
     document.head.appendChild(script);
   }, []);
 
-//   useEffect(()=>{
-// console.log(coord)
-//   }, [coord])
-  
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -49,14 +45,13 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
         if (status === kakao.maps.services.Status.OK) {
           const address = result[0].address.address_name;
           setSelectedAddress(address);
-          setCoord({x: String(latlng.getLng()), y : String(latlng.getLat())})
+          setCoord({ x: String(latlng.getLng()), y: String(latlng.getLat()) })
           console.log(latlng)
           marker.setPosition(latlng);
           marker.setMap(map);
         }
       });
     });
-    
 
     // 검색 버튼 이벤트
     const searchBtn = document.getElementById("searchBtn");
@@ -72,7 +67,7 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
           marker.setPosition(loc);
           marker.setMap(map);
           setSelectedAddress(place.address_name);
-          setCoord({x: String(place.x), y : String(place.y)})
+          setCoord({ x: String(place.x), y: String(place.y) })
 
         }
       });
@@ -125,7 +120,7 @@ const MoimLocationModal = ({ onClose, onSelect }) => {
                 alert("주소를 선택하세요");
                 return;
               }
-              onSelect({selectedAddress, coord});
+              onSelect({ selectedAddress, coord });
               onClose();
             }}
             className="bg-blue-500 text-white px-4 py-2 rounded"

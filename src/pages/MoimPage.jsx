@@ -3,7 +3,7 @@ import BasicLayout from "../layouts/BasicLayout";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import IntroductionMoim from "../components/moim/IntroductionMoim";
-import { getAllPostByMoimId, getAllPostImages, getMoim } from "../api/moimAPI";
+import { getMoim } from "../api/moimAPI";
 import MoimMainLayout from "../components/moim/MoimMainLayout";
 
 const initMoimForm = {
@@ -22,7 +22,6 @@ const MoimPage = () => {
     const searchParams = new URLSearchParams(location.search);
     const id = searchParams.get('moimid');
     const category = searchParams.get('category');
-
     const [moim, setMoim] = useState({ ...initMoimForm });
 
     useEffect(() => {

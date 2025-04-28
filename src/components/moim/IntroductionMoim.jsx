@@ -1,17 +1,12 @@
 import ProfileCard from "./component/moim/ProfileCard";
 import IntroductionCard from "./component/moim/IntroductionCard";
 import NoticeCard from "./component/moim/NoticeCard";
-import ActivityCard from "./component/moim/ActivityCard";
 import { useNavigate } from "react-router-dom";
-import { putJoinMoim } from "../../api/moimAPI";
-import { updateUserInfo } from "../../utils/updateUserInfo"
-import { useDispatch } from "react-redux";
 import { postApplyMoim } from "../../api/moimAPI";
 
 
 const IntroductionMoim = ({ moim, user }) => {
     const nav = useNavigate();
-    const dispatch = useDispatch()
 
     const handleOnClickJoinMoim = (e) => {
         console.log(user)
@@ -29,7 +24,6 @@ const IntroductionMoim = ({ moim, user }) => {
             .then(() => {
                 alert('모임 가입 신청이 완료되었습니다!');
                 nav(`/introduct-moim/moimid?moimid=${moim.id}&category=${moim.category}`);
-                // 뒤로 이동하거나, 신청 완료 상태로 버튼 비활성화할 수도 있음
             })
             .catch(err => {
                 console.error('가입 신청 실패:', err);

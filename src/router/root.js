@@ -1,8 +1,6 @@
 import { Suspense, lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-
 import moimRouter from "./moingRouter";
-
 
 const Loading = <div>Loading....</div>
 const Main = lazy(() => import("../pages/MainPage"))
@@ -37,7 +35,6 @@ const root = createBrowserRouter([
     element: <Suspense fallback={Loading}><ChatMessage/></Suspense>
   },
   {
-
     path: "/create-moim",
     element: <Suspense fallback={Loading}><CreateMoimPage/></Suspense>
   },

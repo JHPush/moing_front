@@ -5,7 +5,7 @@ const ChatMessageBox = ({ gatheringId, memberId, onClose }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ right: '16px', bottom: '16px' });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  
+
   // 드래그 시작 핸들러
   const handleMouseDown = (e) => {
     if (e.target.closest('.header-drag-area')) {
@@ -20,22 +20,22 @@ const ChatMessageBox = ({ gatheringId, memberId, onClose }) => {
   // 드래그 중 핸들러
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    
+
     const deltaX = startPos.x - e.clientX;
     const deltaY = startPos.y - e.clientY;
-    
+
     // 화면 밖으로 나가지 않도록 제한
     const maxWidth = window.innerWidth - 320;
     const maxHeight = window.innerHeight - 480;
-    
+
     const newRight = `${Math.max(16, Math.min(maxWidth, parseInt(position.right) + deltaX))}px`;
     const newBottom = `${Math.max(16, Math.min(maxHeight, parseInt(position.bottom) + deltaY))}px`;
-    
+
     setPosition({
       right: newRight,
       bottom: newBottom
     });
-    
+
     setStartPos({
       x: e.clientX,
       y: e.clientY
@@ -56,7 +56,7 @@ const ChatMessageBox = ({ gatheringId, memberId, onClose }) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     }
-    
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -64,12 +64,12 @@ const ChatMessageBox = ({ gatheringId, memberId, onClose }) => {
   }, [isDragging, startPos]);
 
   return (
-    <div 
+    <div
       className="fixed max-w-xs bg-white rounded-lg shadow-xl flex flex-col z-50 overflow-hidden"
-      style={{ 
-        width: '320px', 
+      style={{
+        width: '320px',
         height: '700px',
-        right: position.right, 
+        right: position.right,
         bottom: position.bottom,
         transition: isDragging ? 'none' : 'box-shadow 0.2s ease',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
@@ -86,8 +86,8 @@ const ChatMessageBox = ({ gatheringId, memberId, onClose }) => {
           </span>
         </div>
         <div className="flex items-center">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="text-white hover:text-blue-200 w-6 h-6 flex items-center justify-center rounded-full hover:bg-blue-700 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

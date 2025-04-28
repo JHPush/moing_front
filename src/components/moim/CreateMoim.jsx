@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { convertUrlToFile } from '../../utils/fileUtils';
 
-const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 30;
 const INTRO_MIN_LENGTH = 10;
 const INTRO_MAX_LENGTH = 300;
@@ -13,16 +12,14 @@ const INTRO_MAX_LENGTH = 300;
 const initMoimForm = {
     owner_id: '',
     name: '',
-    short_description:'',
+    short_description: '',
     introduction_content: '',
     category: '',
     region: '',
-    // gender:'',
-    // age:''
     snapshot: '',
     x: '',
     y: '',
-    owner_nickname:''
+    owner_nickname: ''
 }
 
 const CreateMoim = () => {
@@ -64,7 +61,7 @@ const CreateMoim = () => {
     }
 
     const handleCreateMoing = async (e) => {
-        let checkDouble = false
+
         if (user.gatherings.length >= 5) {
             alert(`최대 5개의 모임까지만 생성 가능합니다`)
             return;
@@ -241,7 +238,7 @@ const CreateMoim = () => {
                         placeholder="함께 하고 싶은 모임 활동을 자세히 소개해주세요 (10자 이상)"
                         onChange={handleUpdateMoim}
                         value={moim.introduction_content}
-                        maxLength={INTRO_MAX_LENGTH + 10} // 완전히 제한하지는 않지만 사용자에게 힌트 제공
+                        maxLength={INTRO_MAX_LENGTH + 10}
                     />
                     <div className={`flex justify-end text-xs mt-1 
                         ${isIntroExceeded ? 'text-red-500 font-medium' :
@@ -299,37 +296,6 @@ const CreateMoim = () => {
                         onSave={handleSelectLocation}
                     />
                 )}
-
-                {/* 참여 제한 */}
-                {/* <div className="mb-6">
-                    <p className="mb-2 font-semibold text-gray-700">참여 제한</p>
-                    <div className="flex gap-4 mb-3">
-                        <select
-                            name='gender'
-                            className="p-2 border border-gray-300 rounded-lg"
-                            value={moim.gender}
-                            onChange={(e) => setMoim({...moim, [e.target.name]:[e.target.value]})}
-                        >
-                            <option value="">성별 무관</option>
-                            <option value="남성만">남성만</option>
-                            <option value="여성만">여성만</option>
-                        </select>
-                        <input
-                            name='age'
-                            type="number"
-                            placeholder="나이 제한 (예: 20~30)"
-                            value={moim.age}
-                            onChange={(e) => setMoim({...moim, [e.target.name]:[e.target.value]})}
-                            className="p-2 border border-gray-300 rounded-lg"
-                        />
-                    </div>
-                    {moim.gender || moim.age ? (
-                        <p className="text-sm text-gray-600">
-                            제한 조건: {moim.gender == ''? '성별 무관' : moim.gender }, {moim.age== ''? '나이 무관' : moim.age}
-                        </p>
-                    ) : null}
-                </div> */}
-                {/* <hr className="my-6" /> */}
 
                 {/* 버튼 */}
                 <div className="flex justify-between">

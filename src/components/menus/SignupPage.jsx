@@ -79,6 +79,7 @@ const SignupPage = () => {
 
     setIsLoading(true);
     cognitoUser.confirmRegistration(confirmationCode, true, async (err, result) => {
+      
       if (err) {
         setErrorMsg('인증 실패: ' + (err.message || '코드를 확인해주세요.'));
         setIsLoading(false);

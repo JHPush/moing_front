@@ -6,7 +6,7 @@ const store = configureStore({
     reducer: {
         user: userReducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),  // logger 추가
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 });
 
 export default store;

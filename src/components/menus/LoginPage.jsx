@@ -1,29 +1,25 @@
-// src/components/menus/LoginPage.jsx
 import React, { useState } from 'react';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { userPool } from '../../aws-config';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserData } from '../../api/userAPI';  // 사용자 정보 가져오기 API 호출
+import { getUserData } from '../../api/userAPI';
 import { useWebSocket } from '../../contexts/WebSocketContext';
 import { saveUserToCookies } from '../../utils/cookieUtils';
 import { setUser } from '../../store/userSlice';
 
-const LoginPage = ({handleOnLogin}) => {
+const LoginPage = ({ handleOnLogin }) => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { connectOnLogin } = useWebSocket(); 
-  const user123 = useSelector((state) => state.user.user);
+  const { connectOnLogin } = useWebSocket();
 
   const handleChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
-
   const handleLogin = async () => {
     const { email, password } = loginData;
-
     const user = new CognitoUser({ Username: email, Pool: userPool });
     const authDetails = new AuthenticationDetails({ Username: email, Password: password });
 
@@ -37,9 +33,8 @@ const LoginPage = ({handleOnLogin}) => {
 
         // DynamoDB에서 사용자 정보 가져오기
         try {
-          const userData = await getUserData(userSub, idToken); // 사용자 정보 API 호출
+          const userData = await getUserData(userSub, idToken);
 
-          // 사용자 정보 저장 (쿠키 및 Redux 상태)
           const userInfo = {
             userId: userData.userId,
             email: userData.email,
@@ -58,13 +53,12 @@ const LoginPage = ({handleOnLogin}) => {
 
           dispatch(setUser(userInfo));
           saveUserToCookies(userInfo);
-          
 
           alert('로그인 성공!');
-          navigate('/');  
+          navigate('/');
 
           //  WebSocket 연결
-          connectOnLogin(userData.userId);    
+          connectOnLogin(userData.userId);
           handleOnLogin()
 
         } catch (error) {

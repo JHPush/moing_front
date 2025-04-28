@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getMoimImageByPresignedUrl, getPresignedURL_get } from "../../../../api/moimAPI";
+import { getPresignedURL_get } from "../../../../api/moimAPI";
 import MoimEditModal from "./MoimEditModal";
 
 const ProfileCard = ({ moim, user, moimRefresh }) => {
@@ -43,18 +43,18 @@ const ProfileCard = ({ moim, user, moimRefresh }) => {
           <span className="text-xs bg-gray-200 text-gray-600 rounded px-2 py-1">
             {moim.category}
           </span>
-          {moim.owner_id === user.userId?
+          {moim.owner_id === user.userId ?
             <span
-            className="flex text-sm items-center gap-1 text-gray-600 cursor-pointer hover:text-blue-600"
-            onClick={() => setShowEditModal(true)}
-          >
-            ⚙️ 설정
-          </span>:<></>}
+              className="flex text-sm items-center gap-1 text-gray-600 cursor-pointer hover:text-blue-600"
+              onClick={() => setShowEditModal(true)}
+            >
+              ⚙️ 설정
+            </span> : <></>}
         </div>
       </div>
 
       {showEditModal && (
-        <MoimEditModal moim={moim} profile={moimProfile} moimRefresh={moimRefresh}  onClose={() => setShowEditModal(false)} />
+        <MoimEditModal moim={moim} profile={moimProfile} moimRefresh={moimRefresh} onClose={() => setShowEditModal(false)} />
       )}
     </aside>
   );

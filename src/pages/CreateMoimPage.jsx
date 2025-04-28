@@ -10,4 +10,5 @@ const CreateMoimPage = ()=>{
         </BasicLayout>
     )
 }
+
 export default CreateMoimPage

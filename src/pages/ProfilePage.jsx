@@ -103,13 +103,13 @@ const ProfilePage = () => {
       {/* 프로필 이미지 업로드 */}
       <div className="relative group cursor-pointer mb-6">
         <label htmlFor="profileImageInput" className="cursor-pointer">
-          <img 
-            src={profile.profileImageUrl || "/default_profile.png"} 
-            alt="프로필 이미지" 
-            className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 group-hover:border-blue-500 transition" 
+          <img
+            src={profile.profileImageUrl || "/default_profile.png"}
+            alt="프로필 이미지"
+            className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 group-hover:border-blue-500 transition"
           />
         </label>
-        <input 
+        <input
           id="profileImageInput"
           type="file"
           accept="image/*"

@@ -1,5 +1,4 @@
 // 게시글 목록 뿌릴 때 쓰는 카드
-
 const MoimPostCard = ({ post, onSelectPost }) => {
     const isSchedule = post.post_type === 'Scheduled';
 
@@ -13,10 +12,10 @@ const MoimPostCard = ({ post, onSelectPost }) => {
                 <h3 className="text-lg font-semibold text-gray-800 truncate">
                     {post.title}
                 </h3>
-                {post.files && post.files.length>0?<div className="flex items-center space-x-1 text-gray-500 text-sm flex-shrink-0 ml-2">
+                {post.files && post.files.length > 0 ? <div className="flex items-center space-x-1 text-gray-500 text-sm flex-shrink-0 ml-2">
                     <span>📷</span>
-                </div>:<></>}
-                
+                </div> : <></>}
+
             </div>
             {/* 모임 일정 안내 (있을 때만) */}
             {isSchedule && (

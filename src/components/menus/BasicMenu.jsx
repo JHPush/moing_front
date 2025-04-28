@@ -13,9 +13,8 @@ const BasicMenu = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
   const { socket, disconnectWebSocket } = useWebSocket();
-
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false); // ★ 로그인 모달 상태
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const handleLogout = () => {
     disconnectWebSocket();
@@ -44,7 +43,7 @@ const BasicMenu = () => {
     setIsLoginOpen(false);
   };
 
-  const handleOnLogin = ()=>{
+  const handleOnLogin = () => {
     console.log('im here')
     setIsLoginOpen(false)
   }
@@ -101,7 +100,7 @@ const BasicMenu = () => {
             >
               ✕
             </button>
-            <LoginPage handleOnLogin={handleOnLogin}/>
+            <LoginPage handleOnLogin={handleOnLogin} />
           </div>
         </div>
       )}

@@ -12,7 +12,7 @@ const MoimPostComponent = ({ moim, user, isOpenPost, reloadTrigger, posts, onSel
             if (entries[0].isIntersecting && !isFetching) {
                 console.log('페이징 리로드 트리거 호출')
                 setIsFetching(true);
-                reloadTrigger(); // 새 데이터 요청
+                reloadTrigger();
             }
         }, { threshold: 1 });
 
@@ -22,14 +22,14 @@ const MoimPostComponent = ({ moim, user, isOpenPost, reloadTrigger, posts, onSel
 
     useEffect(() => {
         console.log('Fetch 호출')
-        setIsFetching(false); // 새 데이터 로드되면 다시 false로 변경
+        setIsFetching(false);
     }, [posts]);
 
     return (
         <main className="col-span-2">
             {/* 스크롤 가능한 카드 리스트 */}
             <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
-                {isOpenPost && <MoimPostWriteCard moim={moim} user={user} reloadTrigger={reloadTrigger} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate}/>}
+                {isOpenPost && <MoimPostWriteCard moim={moim} user={user} reloadTrigger={reloadTrigger} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate} />}
                 {posts.length > 0 ? (
                     posts.map((post, index) => (
                         <MoimPostCard key={`${post.id}-${index}`} post={post} onSelectPost={onSelectPost} />

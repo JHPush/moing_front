@@ -1,12 +1,11 @@
-// src/utils/cookieUtils.js
 import Cookies from 'js-cookie';
 
 export const setCookie = (name, value, days = 7) => {
   Cookies.set(name, value, {
     expires: days,
-    path: '/',           // 모든 경로에서 접근 가능
-    sameSite: 'Lax',     // 기본값 설정, cross-site 문제 방지
-    secure: false        // 로컬 개발 환경에서는 false, 배포 시 true
+    path: '/',
+    sameSite: 'Lax',
+    secure: false
   });
 };
 
@@ -19,7 +18,7 @@ export const removeCookie = (name) => {
 };
 
 export const saveUserToCookies = (user) => {
-    setCookie('user', JSON.stringify(user), 7); // 7일 동안 쿠키 유지
+    setCookie('user', JSON.stringify(user), 7);
 };
 
 export const loadUserFromCookies = () => {

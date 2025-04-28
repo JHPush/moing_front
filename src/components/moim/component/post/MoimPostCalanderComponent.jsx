@@ -85,7 +85,7 @@ const MoimPostCalendarComponent = ({ moim, selectedPost }) => {
             return event.start.toDateString() === clickedDate.toDateString();
         });
 
-        setSelectedEvent(filteredEvents); // 상태 업데이트
+        setSelectedEvent(filteredEvents);
     };
 
     const handleEventClick = (event) => {
@@ -102,7 +102,7 @@ const MoimPostCalendarComponent = ({ moim, selectedPost }) => {
         if (isSameDate) {
             return {
                 style: {
-                    backgroundColor: '#D1FAE5', // 예: 연한 민트색
+                    backgroundColor: '#D1FAE5',
                     borderRadius: '10%',
                 },
             };
@@ -126,11 +126,6 @@ const MoimPostCalendarComponent = ({ moim, selectedPost }) => {
 
             {/* 선택한 날짜 또는 이벤트 표시 */}
             <div className="mt-6 p-4 bg-gray-100 rounded-lg shadow-lg">
-                {/* {selectedDate && (
-                    <h2 className="text-[20px] font-semibold text-blue-400">
-                        해당 날짜의 모임 정보
-                    </h2>
-                )} */}
 
                 {selectedEvent && selectedEvent.length > 0 ? (
                     <ul className="mt-4 space-y-2">

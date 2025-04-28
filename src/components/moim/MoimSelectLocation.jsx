@@ -5,17 +5,17 @@ const SelectLocation = ({ onClose, onSave }) => {
     const [keyword, setKeyword] = useState("");
     const [results, setResults] = useState([]);
 
-    const searchLocation= ()=>{
-        searchLocationApi(keyword).then(data=>{
+    const searchLocation = () => {
+        searchLocationApi(keyword).then(data => {
             console.log(data)
             setResults(data);
-        }).catch(e=>{
+        }).catch(e => {
             console.log('error : ', e)
         })
     }
 
     const handleSelect = (place) => {
-        onSave(place); // 혹은 place.address_name 등
+        onSave(place);
         onClose();
     };
 
@@ -41,7 +41,7 @@ const SelectLocation = ({ onClose, onSave }) => {
                 </div>
 
                 <ul className="max-h-60 overflow-y-auto">
-                    {results&& results.map((place, i) => (
+                    {results && results.map((place, i) => (
                         <li
                             key={i}
                             className="p-3 border-b cursor-pointer hover:bg-blue-50 rounded-md"

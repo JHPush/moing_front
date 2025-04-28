@@ -8,7 +8,6 @@ const MoimEditModal = ({ moim, profile, onClose, moimRefresh }) => {
     const [newProfile, setNewProfile] = useState(null);
     const nav = useNavigate()
 
-
     const handleSave = async (e) => {
         if (shortDescription === '' || introductionContent === '') {
             console.log(moim);

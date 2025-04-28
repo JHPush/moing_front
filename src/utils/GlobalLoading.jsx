@@ -1,4 +1,3 @@
-// components/common/GlobalLoading.js
 import { useLoading } from '../contexts/LoadingContext';
 
 const GlobalLoading = () => {

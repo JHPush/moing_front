@@ -1,7 +1,5 @@
-// lib/axiosConfig.js
 import axios from 'axios';
 import { loadingController } from './loadingController';
-
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_PREFIX_URL
@@ -9,11 +7,11 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
     (config) => {
-        loadingController.start(); // 로딩 시작
+        loadingController.start();
         return config;
     },
     (error) => {
-        loadingController.stop(); // 에러
+        loadingController.stop();
         return Promise.reject(error);
     }
 );

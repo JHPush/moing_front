@@ -15,5 +15,3 @@ export const loadPreviousMessages = async (gatheringId, beforeRegDate, limit = 2
     console.log("이전 메시지 응답:", res);
     return res;
 }
-
-

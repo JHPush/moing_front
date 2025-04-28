@@ -33,7 +33,7 @@ const MyGroupView = () => {
     return (
         <div className="my-groups-container">
             <h1 className="text-2xl font-bold text-left mb-8">내 모임</h1>
-
+            
             <div className="gathering-list">
                 {gatherings.length > 0 ? (
                     <>

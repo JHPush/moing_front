@@ -7,7 +7,7 @@ import MoimLocationModal from '../util/MoimPostLocationModal';
 import MoimPostViewMap from './MoimPostViewMap';
 
 // 게시글 보기 수정 삭제 카드
-const MoimPostView = ({ post, user, onBack, reloadTrigger,handleFinishPostWriteOrUpdate }) => {
+const MoimPostView = ({ post, user, onBack, reloadTrigger, handleFinishPostWriteOrUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [previewFiles, setPreviewFiles] = useState([])
     const [showLocationModal, setShowLocationModal] = useState(false);
@@ -21,8 +21,6 @@ const MoimPostView = ({ post, user, onBack, reloadTrigger,handleFinishPostWriteO
         files: []
     });
 
-
-    // 3. 장소 선택 핸들러 추가
     const handleLocationSelect = (addr) => {
         setEditData({
             ...editData,
@@ -64,36 +62,35 @@ const MoimPostView = ({ post, user, onBack, reloadTrigger,handleFinishPostWriteO
                     return file.fileUrl;
                 });
 
-
                 const uploadUrls = await Promise.all(uploadPromises)
                 console.log('uploadUrls : ', uploadUrls)
                 finalPost.files = uploadUrls;
             }
             console.log(finalPost)
-                updateMoimPost(JSON.stringify({
-                    moim_id: post.gathering_id,
-                    id: post.id,
-                    title: finalPost.title,
-                    content: finalPost.content,
-                    schedule: finalPost.schedule,
-                    moim_addr: finalPost.moim_addr,
-                    moim_x: finalPost.moim_x,
-                    moim_y: finalPost.moim_y,
-                    files: finalPost.files
-                })).then(data => {
-                    if (data.statusCode !== 200) {
-                        console.log(data)
-                        alert('수정 실패!')
-                        return
-                    }
-                    alert('수정 성공');
-                    onBack();
-                    
-                    reloadTrigger()
-                    handleFinishPostWriteOrUpdate()
-                }).catch(e => {
-                    console.log('error : ', e);
-                });
+            updateMoimPost(JSON.stringify({
+                moim_id: post.gathering_id,
+                id: post.id,
+                title: finalPost.title,
+                content: finalPost.content,
+                schedule: finalPost.schedule,
+                moim_addr: finalPost.moim_addr,
+                moim_x: finalPost.moim_x,
+                moim_y: finalPost.moim_y,
+                files: finalPost.files
+            })).then(data => {
+                if (data.statusCode !== 200) {
+                    console.log(data)
+                    alert('수정 실패!')
+                    return
+                }
+                alert('수정 성공');
+                onBack();
+
+                reloadTrigger()
+                handleFinishPostWriteOrUpdate()
+            }).catch(e => {
+                console.log('error : ', e);
+            });
         }
         catch (error) {
             console.error('Error Upload or Post', error)

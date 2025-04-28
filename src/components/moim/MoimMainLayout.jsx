@@ -9,18 +9,14 @@ import PhotoGallery from "./component/PhotoGallery";
 import MoimPostCalanderComponent from "./component/post/MoimPostCalanderComponent";
 import { getAllPostImages, postPagePostByMoimId, putExitMoim } from "../../api/moimAPI";
 import ChatMessageBox from "../Message/ChatMessageBox";
-
 import MemberList from "./component/moim/MemberList"
-
-
-
 
 const MoimMainLayout = ({ moim, user, moimRefresh }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const [isOpenPost, setIsOpenPost] = useState(false)
     const [activeTab, setActiveTab] = useState("home");
-    const [selectedPost, setSelectedPost] = useState(null); // 게시글 상세 보기용
+    const [selectedPost, setSelectedPost] = useState(null);
     const [posts, setPosts] = useState([]);
     const [reloadTrigger, setReloadTrigger] = useState(false);
     const [pageKey, setPageKey] = useState(null)
@@ -61,13 +57,11 @@ const MoimMainLayout = ({ moim, user, moimRefresh }) => {
             const imageResRaw = await getAllPostImages(id, 'moim-post-images');
             const images = JSON.parse(imageResRaw);
             setPostImgRes(images);
-
-            // 여기서 setState만 하지 말고, 직접 리턴!
             return images;
         } catch (error) {
             console.error("이미지 로딩 오류:", error);
         } finally {
-            setImagesLoaded(true); // 얘는 그냥 표시만
+            setImagesLoaded(true);
         }
     };
 
@@ -81,8 +75,6 @@ const MoimMainLayout = ({ moim, user, moimRefresh }) => {
         const images = await refreshGallery();
         getMoimPosts(id, 1, null, images);
     }
-
-
 
     const getMoimPosts = async (id, limit = 5, key = null, externalImages = null) => {
         if (!id) return;

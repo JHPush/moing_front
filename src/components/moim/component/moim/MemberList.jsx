@@ -30,7 +30,7 @@ const MemberList = ({ moim, user }) => {
     try {
       await approveMember(userId, moim.id, moim.category);
       alert("가입 수락 완료!");
-      fetchMembers(); // 새로고침
+      fetchMembers();
       fetchPending();
     } catch (err) {
       alert("가입 수락 실패");

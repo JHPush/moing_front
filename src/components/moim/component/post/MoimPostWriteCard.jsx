@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { getPresignedURL_PostPut, postMoimPost, putUploadMoimImageByPresignedUrl } from "../../../../api/moimAPI";
 import DatePicker from "react-datepicker";
 import MoimLocationModal from "../util/MoimPostLocationModal";
-import { convertUrlsToFiles } from "../../../../utils/fileUtils";
 
 const initState = {
     moim_id: "",
@@ -34,7 +33,7 @@ const MoimPostWriteCard = ({ moim, user, reloadTrigger, handleFinishPostWriteOrU
     const [imageFiles, setImageFiles] = useState([]);
     const [previewFiles, setPreviewFiles] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
-    
+
     // Character count states
     const [titleCharCount, setTitleCharCount] = useState(0);
     const [contentCharCount, setContentCharCount] = useState(0);
@@ -105,12 +104,6 @@ const MoimPostWriteCard = ({ moim, user, reloadTrigger, handleFinishPostWriteOrU
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        
-        // if ((name === 'title' && value.length > TITLE_MAX_LENGTH) || 
-        //     (name === 'content' && value.length > CONTENT_MAX_LENGTH)) {
-        //     return;
-        // }
-        
         setPost({ ...post, [name]: value });
     };
 
