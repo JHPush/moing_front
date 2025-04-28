@@ -14,7 +14,9 @@ export const WebSocketProvider = ({ children }) => {
   const user = useSelector(state => state.user.user)
 
   const connectWebSocket = (loginId) => {
-    const url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${loginId}`;
+    // const url = `wss://pythgx0q47.execute-api.ap-northeast-2.amazonaws.com/production?userId=${loginId}`;
+    const url = `ws.moing.click?userId=${loginId}`;
+
     const ws = new WebSocket(url);
     console.log(loginId)
 

@@ -15,7 +15,7 @@ import MemberList from "./component/moim/MemberList"
 
 
 
-const MoimMainLayout = ({ moim, user,moimRefresh }) => {
+const MoimMainLayout = ({ moim, user, moimRefresh }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const [isOpenPost, setIsOpenPost] = useState(false)
@@ -56,12 +56,12 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
     const refreshGallery = async () => {
         if (!id) return;
         console.log('이미지 강제 업데이트~!');
-    
+
         try {
             const imageResRaw = await getAllPostImages(id, 'moim-post-images');
             const images = JSON.parse(imageResRaw);
             setPostImgRes(images);
-    
+
             // 여기서 setState만 하지 말고, 직접 리턴!
             return images;
         } catch (error) {
@@ -77,11 +77,11 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
         setPosts([]);
         setPageKey(null);
         setIsOpenPost(false);
-    
-        const images = await refreshGallery(); 
+
+        const images = await refreshGallery();
         getMoimPosts(id, 1, null, images);
     }
-    
+
 
 
     const getMoimPosts = async (id, limit = 5, key = null, externalImages = null) => {
@@ -132,7 +132,7 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
         putExitMoim(moim.id, moim.category, user.userId).then(d => {
             console.log(d)
             alert('모임을 탈퇴했습니다')
-            nav('/', {replace:true})
+            nav('/', { replace: true })
         }).catch(e => {
             console.log('error', e)
         })
@@ -206,7 +206,7 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
                                 </svg>
                                 <span>멤버초대하기</span>
                             </div>
-                            {user.userId === moim.owner_id? <></>: <div className="text-gray-500 cursor-pointer hover:underline" onClick={handleOnExitMoim}>모임 탈퇴</div>}
+                            {user.userId === moim.owner_id ? <></> : <div className="text-gray-500 cursor-pointer hover:underline" onClick={handleOnExitMoim}>모임 탈퇴</div>}
 
                         </div>
                     </aside>
@@ -218,20 +218,13 @@ const MoimMainLayout = ({ moim, user,moimRefresh }) => {
                             }} />
                         )}
                         {activeTab === "photo" &&
-                            <div>
-                                <button
-                                    className="mb-4 px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm"
-                                    onClick={refreshGallery} >
-                                    사진 새로고침
-                                </button>
-                                <PhotoGallery photos={postImgRes} />
-                            </div>
+                            <PhotoGallery photos={postImgRes} />
                         }
                         {activeTab === "schedule" && <MoimPostCalanderComponent moim={moim} posts={posts} selectedPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />}
                         {activeTab === "member" && <MemberList moim={moim} user={user} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
-                            <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate}  onBack={() => setActiveTab("home")} />
+                            <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate} onBack={() => setActiveTab("home")} />
                         )}
                     </div>
                     <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />
