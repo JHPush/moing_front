@@ -216,7 +216,7 @@ const MoimMainLayout = ({ moim, user, moimRefresh }) => {
                         {activeTab === "member" && <MemberList moim={moim} user={user} />}
                         {activeTab === 'inviteMember' && <InviteMoim moim_id={moim.id} moim_category={moim.category} />}
                         {activeTab === "postDetail" && selectedPost && (
-                            <MoimPostView user={user} post={selectedPost} reloadTrigger={handleReload} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate} onBack={() => setActiveTab("home")} />
+                            <MoimPostView user={user} post={selectedPost} handleFinishPostWriteOrUpdate={handleFinishPostWriteOrUpdate} onBack={() => setActiveTab("home")} />
                         )}
                     </div>
                     <MoimRecentPostCard post={posts.find(post => post.post_type === 'Scheduled')} onSelectPost={(post) => { setSelectedPost(post); setActiveTab("postDetail"); }} />
